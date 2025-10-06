@@ -1,0 +1,46 @@
+---
+sidebar: sidebar 
+permalink: task-tiering-onprem-overview.html 
+keywords: overview, tiering overview, tiered clusters, clusters enabled for tiering, data tiering overview, cold data, hot data, tiered data, savings, savings opportunities, saving opportunity, policies, cold snapshots, all dp user data, cold user data & snapshots, cold user data and snapshots, all user data, no policy, marketplace subscriptions, clusters associated 
+summary: Cloud Tiering fornisce una vista aggregata della suddivisione in livelli dei dati da ciascuno dei cluster locali.  Questa panoramica fornisce un quadro chiaro del tuo ambiente e ti consente di adottare le misure appropriate. 
+---
+= Ottieni una panoramica del tiering dei dati dai tuoi cluster in NetApp Cloud Tiering
+:hardbreaks:
+:allow-uri-read: 
+:nofooter: 
+:icons: font
+:linkattrs: 
+:imagesdir: ./media/
+
+
+[role="lead"]
+NetApp Cloud Tiering fornisce una vista aggregata della suddivisione in livelli dei dati da ciascuno dei cluster locali.  Questa panoramica fornisce un quadro chiaro del tuo ambiente e ti consente di adottare le misure appropriate.
+
+Seleziona *Cloud Tiering > Dashboard locale* per visualizzare i seguenti dettagli sul tuo ambiente.
+
+image:screenshot_tiering_onprem_dashboard.png["Uno screenshot della pagina della Dashboard locale."]
+
+Cluster scoperti:: Numero di cluster on-premise scoperti da Cloud Tiering.  Il grafico fornisce una panoramica dello stato di suddivisione in livelli per questi cluster.
++
+--
+* Tiering elevato: cluster che suddividono in livelli oltre il 20% dei loro dati inattivi
+* Tiering basso: cluster che suddividono in livelli meno del 20% dei loro dati inattivi
+* Nessun livello: cluster che non dispongono di livelli di dati
+* Non idoneo - Cluster che non supportano la suddivisione in livelli dei dati
+
+
+--
+Panoramica dei dati:: La quantità di dati utilizzata da tutti i cluster scoperti. Il grafico mostra la quantità di dati suddivisa in livelli per questi cluster.
++
+--
+* Dati a livelli: dati inattivi totali che vengono suddivisi in livelli nel cloud
+* Dati freddi - Totale dei dati freddi che non vengono suddivisi in livelli
+* Dati attivi: dati attivi totali in uso
+* Non idoneo: dati totali che non vengono suddivisi in livelli perché il cluster o il volume non supporta la suddivisione in livelli dei dati
+
+
+--
+Panoramica dei livelli:: La quantità di dati attualmente sottoposti a livelli e la quantità di dati inattivi che potrebbero potenzialmente essere sottoposti a livelli.
+Politiche:: Numero di volte in cui ogni criterio di suddivisione in livelli è stato applicato a un volume.
+Abbonamenti al Marketplace:: Il numero di cluster associati a ciascun tipo di abbonamento Marketplace e un'indicazione sullo stato dell'abbonamento.
+

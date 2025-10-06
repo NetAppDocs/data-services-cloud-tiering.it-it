@@ -1,0 +1,535 @@
+---
+sidebar: sidebar 
+permalink: faq-cloud-tiering.html 
+keywords: faq, questions, requirements, service connector, agent, object store, object storage, aws, azure, bucket, cluster, aggregate, s3, storage class, standard, inactive data reporting, auto, volume tiering policy, policy, tiering policy, snapshot, cold, inactive, infrequent, agent, netapp console, console,cloud tier 
+summary: Questa sezione FAQ può aiutarti se stai cercando una risposta rapida a una domanda. 
+---
+= Domande frequenti tecniche su NetApp Cloud Tiering
+:hardbreaks:
+:allow-uri-read: 
+:nofooter: 
+:icons: font
+:linkattrs: 
+:imagesdir: ./media/
+
+
+[role="lead"]
+Questa sezione FAQ può aiutarti se stai cercando una risposta rapida a una domanda riguardante NetApp Cloud Tiering.
+
+
+
+== Servizio di Cloud Tiering
+
+Le seguenti FAQ riguardano il funzionamento del Cloud Tiering.
+
+
+
+=== Quali sono i vantaggi dell'utilizzo del servizio Cloud Tiering?
+
+Cloud Tiering affronta le sfide che derivano dalla rapida crescita dei dati, offrendoti vantaggi quali:
+
+* Estensione senza sforzo del data center al cloud, che fornisce fino a 50 volte più spazio
+* Ottimizzazione dello storage, con un risparmio medio dello storage del 70%
+* Riduzione media del costo totale di proprietà del 30%
+* Non c'è bisogno di riorganizzare le applicazioni
+
+
+
+
+=== Che tipo di dati è utile trasferire nel cloud?
+
+In sostanza, tutti i dati considerati inattivi sui sistemi di archiviazione primari e secondari rappresentano un buon obiettivo da spostare nel cloud.  Nei sistemi primari, tali dati possono includere snapshot, registrazioni storiche e progetti completati.  Nei sistemi secondari, ciò include tutti i volumi che contengono copie di dati primari realizzate per scopi di ripristino di emergenza e backup.
+
+
+
+=== Posso suddividere in livelli i dati provenienti sia da volumi NAS che da volumi SAN?
+
+Sì, è possibile suddividere i dati dai volumi NAS al cloud pubblico o ai cloud privati, come StorageGRID.  Quando si suddividono in livelli i dati a cui si accede tramite protocolli SAN, NetApp consiglia di utilizzare cloud privati ​​perché i protocolli SAN sono più sensibili ai problemi di connettività rispetto ai NAS.
+
+
+
+=== Qual è la definizione di dati inattivi o dati utilizzati raramente e come vengono controllati?
+
+La definizione di ciò che può essere definito anche cold data è: "blocchi di volume (metadati esclusi) a cui non si è avuto accesso per un certo periodo di tempo".  La “quantità di tempo” è determinata da un attributo della politica di suddivisione in livelli denominato cooling-days.
+
+
+
+=== Cloud Tiering manterrà i risparmi in termini di efficienza di archiviazione nel livello cloud?
+
+Sì, le efficienze di archiviazione a livello di volume ONTAP , come compressione, deduplicazione e compattazione, vengono preservate quando si spostano i dati al livello cloud.
+
+
+
+=== Qual è la differenza tra FabricPool e Cloud Tiering?
+
+FabricPool è la tecnologia di tiering ONTAP che può essere autogestita tramite ONTAP CLI e System Manager oppure gestita come servizio tramite Cloud Tiering.  Cloud Tiering trasforma FabricPool in un servizio gestito con processi di automazione avanzati, sia su ONTAP che nel cloud, offrendo maggiore visibilità e controllo sul tiering nelle distribuzioni ibride e multi-cloud.
+
+
+
+=== I dati archiviati nel cloud possono essere utilizzati per il disaster recovery o per il backup/archiviazione?
+
+No. Poiché i metadati del volume non vengono mai suddivisi in livelli a partire dal livello delle prestazioni, non è possibile accedere direttamente ai dati archiviati nell'archiviazione degli oggetti.
+
+Tuttavia, Cloud Tiering può essere utilizzato per ottenere backup e DR convenienti abilitandolo su sistemi secondari e volumi di destinazione SnapMirror (volumi DP), per suddividere in livelli tutti i dati (metadati esclusi), riducendo così l'ingombro del data center e il TCO.
+
+
+
+=== Il Cloud Tiering viene applicato a livello di volume o di aggregato?
+
+Il Cloud Tiering viene abilitato a livello di volume associando una policy di tiering a ciascun volume.  L'identificazione dei dati a freddo avviene a livello di blocco.
+
+
+
+=== In che modo Cloud Tiering determina quali blocchi assegnare al cloud?
+
+La politica di suddivisione in livelli associata al volume è il meccanismo che controlla quali blocchi vengono suddivisi in livelli e quando.  La policy definisce il tipo di blocchi di dati (snapshot, dati utente o entrambi) e il periodo di raffreddamento. Vederelink:concept-cloud-tiering.html#volume-tiering-policies["Criteri di suddivisione in livelli del volume"] per i dettagli.
+
+
+
+=== In che modo Cloud Tiering influisce sulla capacità del volume?
+
+Il Cloud Tiering non ha alcun effetto sulla capacità del volume, bensì sull'utilizzo del livello di prestazioni dell'aggregato.
+
+
+
+=== Cloud Tiering consente la segnalazione dei dati inattivi?
+
+Sì, Cloud Tiering abilita la segnalazione dei dati inattivi (IDR) su ogni aggregato.  Questa impostazione ci consente di identificare la quantità di dati inattivi che possono essere suddivisi in livelli di archiviazione di oggetti a basso costo.
+
+
+
+=== Quanto tempo impiega IDR a mostrare le informazioni dal momento in cui inizio a eseguirlo?
+
+IDR inizia a mostrare le informazioni una volta trascorso il periodo di raffreddamento configurato.  Utilizzando ONTAP 9.7 e versioni precedenti, IDR aveva un periodo di raffreddamento non regolabile di 31 giorni.  A partire da ONTAP 9.8, il periodo di raffreddamento IDR può essere configurato fino a 183 giorni.
+
+
+
+== Licenze e costi
+
+Le seguenti FAQ riguardano le licenze e i costi per l'utilizzo di Cloud Tiering.
+
+
+
+=== Quanto costa utilizzare Cloud Tiering?
+
+Quando si trasferiscono i dati inattivi al cloud pubblico:
+
+* Per l'abbonamento pay-as-you-go (PAYGO), basato sull'utilizzo: $ 0,05 per GB/mese.
+* Per l'abbonamento annuale (BYOL) a termine: a partire da $ 0,033 per GB/mese.
+
+
+https://bluexp.netapp.com/pricing["Vedi i dettagli dei prezzi"] .
+
+Il trasferimento di dati inattivi a un sistema NetApp StorageGRID (cloud privato) non comporta alcun costo.
+
+
+
+=== Posso avere sia una licenza BYOL che una licenza PAYGO per lo stesso cluster ONTAP ?
+
+Sì. Cloud Tiering consente di utilizzare una licenza BYOL, un abbonamento PAYGO o una combinazione di entrambi.
+
+
+
+=== Cosa succede se ho raggiunto il limite di capacità BYOL o se la mia licenza BYOL scade?
+
+Se si raggiunge il limite di capacità BYOL o se la licenza BYOL scade, la suddivisione in livelli dei nuovi dati inattivi si interrompe.  Tutti i dati precedentemente suddivisi in livelli rimangono accessibili, il che significa che è possibile recuperarli e utilizzarli.  Una volta recuperati, questi dati vengono spostati nuovamente dal cloud al livello di prestazioni.
+
+Tuttavia, se si dispone di un abbonamento al marketplace PAYGO per _BlueXP - Deploy & Manage Cloud Data Services_, i nuovi dati inattivi continueranno a essere suddivisi in livelli nell'archiviazione degli oggetti e si pagheranno tali costi in base all'utilizzo.
+
+
+
+=== La licenza Cloud Tiering include i costi di uscita dal provider cloud?
+
+No, non lo è.
+
+
+
+=== La reidratazione del sistema on-premise è soggetta ai costi di uscita addebitati dai provider cloud?
+
+Sì. Tutte le letture dal cloud pubblico sono soggette a tariffe di uscita.
+
+
+
+=== Come posso stimare i costi del mio cloud?  Esiste una modalità "cosa succederebbe se" per Cloud Tiering?
+
+Il modo migliore per stimare quanto ti addebiterà un provider cloud per l'hosting dei tuoi dati è utilizzare i loro calcolatori: https://calculator.aws/#/["AWS"] , https://azure.microsoft.com/en-us/pricing/calculator/["Azzurro"] E https://cloud.google.com/products/calculator["Google Cloud"] .
+
+
+
+=== Ci sono costi aggiuntivi da parte dei provider cloud per la lettura/recupero dei dati dall'archiviazione degli oggetti all'archiviazione locale?
+
+
+
+=== Ci sono costi aggiuntivi da parte dei provider cloud per la lettura/recupero dei dati dall'archiviazione degli oggetti all'archiviazione locale?
+
+Sì. Controllo https://aws.amazon.com/s3/pricing/["Prezzi di Amazon S3"] , https://azure.microsoft.com/en-us/pricing/details/storage/blobs/["Prezzi dei blocchi Blob"] , E https://cloud.google.com/storage/pricing["Prezzi dell'archiviazione cloud"] per i costi aggiuntivi sostenuti per la lettura/recupero dei dati.
+
+
+
+=== Come posso stimare il risparmio sui miei volumi e ottenere un report sui dati inattivi prima di abilitare Cloud Tiering?
+
+Per ottenere una stima, aggiungi il tuo cluster ONTAP alla console NetApp e ispezionalo tramite la pagina Cloud Tiering Clusters.  Selezionare *Calcola potenziali risparmi di tiering* per il cluster per avviare il https://bluexp.netapp.com/cloud-tiering-service-tco["Calcolatore TCO del cloud tiering"^] per vedere quanti soldi puoi risparmiare.
+
+
+
+=== Come mi vengono addebitati i costi di suddivisione in livelli quando utilizzo un ONTAP MetroCluster?
+
+Se utilizzata in ambienti MetroCluster , la licenza a livelli totali viene applicata all'utilizzo di entrambi i cluster.  Ad esempio, se si dispone di una licenza per 100 TiB di tiering, la capacità di tiering utilizzata da ciascun cluster contribuisce alla capacità totale di 100 TiB.
+
+
+
+== ONTAP
+
+Le seguenti domande riguardano ONTAP.
+
+
+
+=== Quali versioni di ONTAP supporta Cloud Tiering?
+
+Cloud Tiering supporta ONTAP versione 9.2 e successive.
+
+
+
+=== Quali tipi di sistemi ONTAP sono supportati?
+
+Cloud Tiering è supportato con cluster AFF, FAS e ONTAP Select a nodo singolo e ad alta disponibilità.  Sono supportati anche i cluster nelle configurazioni FabricPool Mirror e MetroCluster .
+
+
+
+=== Posso suddividere in livelli i dati provenienti da sistemi FAS solo con HDD?
+
+Sì, a partire da ONTAP 9.8 è possibile suddividere in livelli i dati provenienti da volumi ospitati su aggregati HDD.
+
+
+
+=== Posso suddividere in livelli i dati da un AFF unito a un cluster che ha nodi FAS con HDD?
+
+Sì. Cloud Tiering può essere configurato per suddividere in livelli i volumi ospitati su qualsiasi aggregato.  La configurazione del tiering dei dati è irrilevante rispetto al tipo di controller utilizzato e al fatto che il cluster sia eterogeneo o meno.
+
+
+
+=== Che dire di Cloud Volumes ONTAP?
+
+Se disponi di sistemi Cloud Volumes ONTAP , li troverai nella pagina Cloud Tiering Clusters, così avrai una visione completa della suddivisione in livelli dei dati nella tua infrastruttura cloud ibrida.  Tuttavia, i sistemi Cloud Volumes ONTAP sono di sola lettura da Cloud Tiering.  Non è possibile impostare il tiering dei dati su Cloud Volumes ONTAP da Cloud Tiering. https://docs.netapp.com/us-en/bluexp-cloud-volumes-ontap/task-tiering.html["È possibile impostare il tiering per i sistemi Cloud Volumes ONTAP dal sistema ONTAP nella console NetApp"^] .
+
+
+
+=== Quali altri requisiti sono necessari per i miei cluster ONTAP ?
+
+Dipende da dove si suddividono i dati inattivi.  Per maggiori dettagli fare riferimento ai seguenti link:
+
+* link:task-tiering-onprem-aws.html#prepare-your-ontap-cluster["Livelli di dati su Amazon S3"]
+* link:task-tiering-onprem-azure.html#preparing-your-ontap-clusters["Suddivisione dei dati in livelli nell'archiviazione BLOB di Azure"]
+* link:task-tiering-onprem-gcp.html#preparing-your-ontap-clusters["Livelli di dati su Google Cloud Storage"]
+* link:task-tiering-onprem-storagegrid.html#preparing-your-ontap-clusters["Livelli di dati su StorageGRID"]
+* link:task-tiering-onprem-s3-compat.html#preparing-your-ontap-clusters["Livelli di dati nell'archiviazione di oggetti S3"]
+
+
+
+
+== Archiviazione di oggetti
+
+Le seguenti domande riguardano l'archiviazione degli oggetti.
+
+
+
+=== Quali provider di archiviazione di oggetti sono supportati?
+
+Cloud Tiering supporta i seguenti provider di archiviazione di oggetti:
+
+* Amazon S3
+* Blob di Microsoft Azure
+* Google Cloud Storage
+* NetApp StorageGRID
+* Archiviazione di oggetti compatibile con S3 (ad esempio, MinIO)
+* IBM Cloud Object Storage (la configurazione FabricPool deve essere eseguita tramite System Manager o ONTAP CLI)
+
+
+
+
+=== Posso usare il mio secchio/contenitore?
+
+Sì, puoi. Quando si imposta la suddivisione in livelli dei dati, è possibile scegliere se aggiungere un nuovo bucket/contenitore o selezionarne uno esistente.
+
+
+
+=== Quali regioni sono supportate?
+
+* link:reference-aws-support.html["Regioni AWS supportate"]
+* link:reference-azure-support.html["Regioni di Azure supportate"]
+* link:reference-google-support.html["Regioni Google Cloud supportate"]
+
+
+
+
+=== Quali classi di archiviazione S3 sono supportate?
+
+Cloud Tiering supporta la suddivisione in livelli dei dati nelle classi di archiviazione _Standard_, _Standard-Infrequent Access_, _One Zone-Infrequent Access_, _Intelligent Tiering_ e _Glacier Instant Retrieval_. Vederelink:reference-aws-support.html["Classi di archiviazione S3 supportate"] per maggiori dettagli.
+
+
+
+=== Perché Amazon S3 Glacier Flexible e S3 Glacier Deep Archive non sono supportati da Cloud Tiering?
+
+Il motivo principale per cui Amazon S3 Glacier Flexible e S3 Glacier Deep Archive non sono supportati è che Cloud Tiering è progettato come una soluzione di tiering ad alte prestazioni, pertanto i dati devono essere costantemente disponibili e rapidamente accessibili per il recupero.  Con S3 Glacier Flexible e S3 Glacier Deep Archive, il recupero dei dati può durare da pochi minuti a 48 ore.
+
+
+
+=== Posso utilizzare altri servizi di archiviazione di oggetti compatibili con S3, come MinIO, con Cloud Tiering?
+
+Sì, la configurazione dell'archiviazione di oggetti compatibile con S3 tramite l'interfaccia utente di Tiering è supportata per i cluster che utilizzano ONTAP 9.8 e versioni successive. link:task-tiering-onprem-s3-compat.html["Vedi i dettagli qui"] .
+
+
+
+=== Quali livelli di accesso ad Azure Blob sono supportati?
+
+Cloud Tiering supporta il data tiering nei livelli di accesso _Hot_ o _Cool_ per i dati inattivi. Vederelink:reference-azure-support.html["Livelli di accesso supportati ad Azure Blob"] per maggiori dettagli.
+
+
+
+=== Quali classi di archiviazione sono supportate per Google Cloud Storage?
+
+Cloud Tiering supporta la suddivisione in livelli dei dati nelle classi di archiviazione _Standard_, _Nearline_, _Coldline_ e _Archive_. Vederelink:reference-google-support.html["Classi di archiviazione Google Cloud supportate"] per maggiori dettagli.
+
+
+
+=== Cloud Tiering supporta l'uso di policy di gestione del ciclo di vita?
+
+Sì. È possibile abilitare la gestione del ciclo di vita in modo che Cloud Tiering trasferisca i dati dalla classe di archiviazione/livello di accesso predefinito a un livello più conveniente dopo un certo numero di giorni.  La regola del ciclo di vita viene applicata a tutti gli oggetti nel bucket selezionato per Amazon S3 e Google Cloud Storage e a tutti i contenitori nell'account di archiviazione selezionato per Azure Blob.
+
+
+
+=== Cloud Tiering utilizza un archivio oggetti per l'intero cluster o uno per aggregato?
+
+In una configurazione tipica è presente un archivio oggetti per l'intero cluster.  A partire da agosto 2022, è possibile utilizzare la pagina *Configurazione avanzata* per aggiungere ulteriori archivi di oggetti per un cluster e quindi collegare archivi di oggetti diversi a diversi aggregati oppure collegare 2 archivi di oggetti a un aggregato per il mirroring.
+
+
+
+=== È possibile collegare più secchi allo stesso aggregato?
+
+È possibile collegare fino a due bucket per aggregato ai fini del mirroring, in cui i dati inattivi vengono suddivisi in livelli sincronizzati in entrambi i bucket.  I bucket possono provenire da diversi fornitori e da diverse località.  A partire da agosto 2022, sarà possibile utilizzare la pagina *Configurazione avanzata* per collegare due archivi di oggetti a un singolo aggregato.
+
+
+
+=== È possibile collegare bucket diversi a aggregati diversi nello stesso cluster?
+
+Sì. La migliore pratica generale è quella di collegare un singolo bucket a più aggregati.  Tuttavia, quando si utilizza il cloud pubblico, esiste una limitazione massima di IOPS per i servizi di archiviazione di oggetti, pertanto è necessario prendere in considerazione più bucket.
+
+
+
+=== Cosa succede ai dati suddivisi in livelli quando si migra un volume da un cluster a un altro?
+
+Quando si migra un volume da un cluster a un altro, tutti i dati inattivi vengono letti dal livello cloud.  La posizione di scrittura sul cluster di destinazione dipende dall'abilitazione della suddivisione in livelli e dal tipo di criterio di suddivisione in livelli utilizzato sui volumi di origine e di destinazione.
+
+
+
+=== Cosa succede ai dati suddivisi in livelli quando si sposta un volume da un nodo a un altro nello stesso cluster?
+
+Se l'aggregato di destinazione non ha un livello cloud associato, i dati vengono letti dal livello cloud dell'aggregato di origine e scritti interamente nel livello locale dell'aggregato di destinazione.  Se l'aggregato di destinazione ha un livello cloud collegato, i dati vengono letti dal livello cloud dell'aggregato di origine e prima scritti nel livello locale dell'aggregato di destinazione, per facilitare un passaggio rapido.  Successivamente, in base alla politica di suddivisione in livelli utilizzata, viene scritto nel livello cloud.
+
+A partire da ONTAP 9.6, se l'aggregato di destinazione utilizza lo stesso livello cloud dell'aggregato di origine, i dati inattivi non vengono spostati nuovamente al livello locale.
+
+
+
+=== Come posso riportare i miei dati a livelli in locale al livello di prestazioni?
+
+La riscrittura viene generalmente eseguita sulle letture e dipende dal tipo di policy di suddivisione in livelli.  Prima di ONTAP 9.8, la riscrittura dell'intero volume poteva essere effettuata con un'operazione di _spostamento del volume_.  A partire da ONTAP 9.8, l'interfaccia utente di Tiering offre le opzioni per *Ripristinare tutti i dati* o *Ripristinare il file system attivo*. link:task-managing-tiering.html#migrating-data-from-the-cloud-tier-back-to-the-performance-tier["Scopri come riportare i dati al livello di prestazioni"] .
+
+
+
+=== Quando si sostituisce un controller AFF/ FAS esistente con uno nuovo, i dati suddivisi in livelli verrebbero migrati nuovamente in locale?
+
+No. Durante la procedura di "scambio di teste", l'unica cosa che cambia è la proprietà dell'aggregato.  In questo caso, verrà modificato il controller senza alcun trasferimento di dati.
+
+
+
+=== Posso utilizzare la console del provider cloud o gli esploratori di archiviazione degli oggetti per esaminare i dati suddivisi in livelli in un bucket?  Posso utilizzare i dati memorizzati nell'archivio oggetti direttamente senza ONTAP?
+
+No. Gli oggetti creati e distribuiti sul cloud non contengono un singolo file, ma fino a 1.024 blocchi da 4 KB provenienti da più file.  I metadati di un volume rimangono sempre nel livello locale.
+
+
+
+== Agenti della console
+
+Le seguenti domande riguardano l'agente Console.
+
+
+
+=== Che cos'è l'agente Console?
+
+L'agente Console è un software in esecuzione su un'istanza di elaborazione all'interno del tuo account cloud o in locale, che consente alla console NetApp di gestire in modo sicuro le risorse cloud.  Per utilizzare il servizio Cloud Tiering, è necessario distribuire un agente.
+
+
+
+=== Dove deve essere installato l'agente Console?
+
+* Quando si suddividono i dati in livelli su S3, l'agente può risiedere in un VPC AWS o nei locali dell'utente.
+* Quando si suddividono i dati in livelli nell'archiviazione BLOB, l'agente può risiedere in una rete virtuale di Azure o in sede.
+* Quando si suddividono i dati in livelli su Google Cloud Storage, l'agente deve risiedere in una VPC di Google Cloud Platform.
+* Quando si suddividono i dati in livelli su StorageGRID o altri provider di storage compatibili con S3, l'agente deve risiedere presso la sede dell'utente.
+
+
+
+
+=== Posso distribuire l'agente Console in locale?
+
+Sì. Il software dell'agente può essere scaricato e installato manualmente su un host Linux nella tua rete. https://docs.netapp.com/us-en/bluexp-setup-admin/task-install-connector-on-prem.html["Scopri come installare l'agente nei tuoi locali"] .
+
+
+
+=== È necessario un account presso un fornitore di servizi cloud prima di utilizzare Cloud Tiering?
+
+Sì. È necessario disporre di un account prima di poter definire l'archiviazione degli oggetti che si desidera utilizzare.  È inoltre necessario un account presso un provider di archiviazione cloud quando si configura l'agente nel cloud su una VPC o una VNet.
+
+
+
+=== Quali sono le implicazioni se l'agente della console non funziona?
+
+In caso di guasto di un agente, viene compromessa solo la visibilità negli ambienti a livelli.  Tutti i dati sono accessibili e i dati freddi appena identificati vengono automaticamente suddivisi in livelli nell'archiviazione degli oggetti.
+
+
+
+== Politiche di suddivisione in livelli
+
+
+
+=== Quali sono le politiche di suddivisione in livelli disponibili?
+
+Esistono quattro politiche di suddivisione in livelli:
+
+* Nessuno: classifica tutti i dati come sempre attivi, impedendo che i dati del volume vengano spostati nell'archivio oggetti.
+* Cold Snapshot (solo snapshot): solo i blocchi cold snapshot vengono spostati nell'archiviazione degli oggetti.
+* Dati utente freddi e snapshot (automatico): sia i blocchi di snapshot freddi sia i blocchi di dati utente freddi vengono spostati nell'archiviazione degli oggetti.
+* Tutti i dati utente (Tutti): classifica tutti i dati come freddi, spostando immediatamente l'intero volume nell'archivio oggetti.
+
+
+link:concept-cloud-tiering.html#volume-tiering-policies["Scopri di più sulle politiche di suddivisione in livelli"] .
+
+
+
+=== A che punto i miei dati vengono considerati freddi?
+
+Poiché la suddivisione in livelli dei dati viene eseguita a livello di blocco, un blocco di dati viene considerato freddo dopo che non è stato utilizzato per un certo periodo di tempo, definito dall'attributo minimum-cooling-days della policy di suddivisione in livelli.  L'intervallo applicabile è di 2-63 giorni con ONTAP 9.7 e versioni precedenti, oppure di 2-183 giorni a partire da ONTAP 9.8.
+
+
+
+=== Qual è il periodo di raffreddamento predefinito per i dati prima che vengano trasferiti al livello cloud?
+
+Il periodo di raffreddamento predefinito per la policy Cold Snapshot è di 2 giorni, mentre il periodo di raffreddamento predefinito per Cold User Data e Snapshot è di 31 giorni.  Il parametro cooling-days non è applicabile alla politica All Tiering.
+
+
+
+=== Quando eseguo un backup completo, tutti i dati suddivisi in livelli vengono recuperati dall'archiviazione degli oggetti?
+
+Durante il backup completo vengono letti tutti i dati freddi.  Il recupero dei dati dipende dalla politica di suddivisione in livelli utilizzata.  Quando si utilizzano i criteri Tutti i dati utente e snapshot non utilizzati, i dati non utilizzati non vengono riscritti nel livello di prestazioni.  Quando si utilizza il criterio Cold Snapshots, solo nel caso in cui per il backup venga utilizzato un vecchio snapshot, verranno recuperati i relativi blocchi cold.
+
+
+
+=== È possibile scegliere una dimensione di suddivisione in livelli per volume?
+
+No. Tuttavia, puoi scegliere quali volumi sono idonei per la suddivisione in livelli, il tipo di dati da suddividere in livelli e il relativo periodo di raffreddamento.  Ciò avviene associando una politica di suddivisione in livelli a quel volume.
+
+
+
+=== La politica All User Data è l'unica opzione per i volumi di protezione dei dati?
+
+No. I volumi di protezione dei dati (DP) possono essere associati a una qualsiasi delle tre policy disponibili.  Il tipo di policy utilizzata sui volumi di origine e di destinazione (DP) determina la posizione di scrittura dei dati.
+
+
+
+=== Reimpostare la policy di suddivisione in livelli di un volume su Nessuno ripristina i dati inattivi o impedisce semplicemente che i futuri blocchi inattivi vengano spostati nel cloud?
+
+Quando si reimposta una policy di tiering non avviene alcuna reidratazione, ma ciò impedirà che nuovi blocchi freddi vengano spostati nel livello cloud.
+
+
+
+=== Dopo aver suddiviso i dati nel cloud, posso modificare la politica di suddivisione in livelli?
+
+Sì. Il comportamento dopo la modifica dipende dalla nuova policy associata.
+
+
+
+=== Cosa devo fare per assicurarmi che determinati dati non vengano spostati nel cloud?
+
+Non associare una policy di suddivisione in livelli al volume contenente tali dati.
+
+
+
+=== Dove vengono archiviati i metadati dei file?
+
+I metadati di un volume vengono sempre archiviati localmente, sul livello delle prestazioni, e non vengono mai trasferiti sul cloud.
+
+
+
+== Rete e sicurezza
+
+Le seguenti domande riguardano la rete e la sicurezza.
+
+
+
+=== Quali sono i requisiti di rete?
+
+* Il cluster ONTAP avvia una connessione HTTPS sulla porta 443 con il provider di archiviazione degli oggetti.
++
+ONTAP legge e scrive dati da e verso l'archiviazione di oggetti.  L'archiviazione degli oggetti non si avvia mai, risponde e basta.
+
+* Per StorageGRID, il cluster ONTAP avvia una connessione HTTPS tramite una porta specificata dall'utente a StorageGRID (la porta è configurabile durante la configurazione dei livelli).
+* Un agente necessita di una connessione HTTPS in uscita sulla porta 443 verso i cluster ONTAP , verso l'archivio oggetti e verso il servizio Cloud Tiering.
+
+
+Per maggiori dettagli, vedere:
+
+* link:task-tiering-onprem-aws.html["Livelli di dati su Amazon S3"]
+* link:task-tiering-onprem-azure.html["Suddivisione dei dati in livelli nell'archiviazione BLOB di Azure"]
+* link:task-tiering-onprem-gcp.html["Livelli di dati su Google Cloud Storage"]
+* link:task-tiering-onprem-storagegrid.html["Livelli di dati su StorageGRID"]
+* link:task-tiering-onprem-s3-compat.html["Livelli di dati nell'archiviazione di oggetti S3"]
+
+
+
+
+=== Quali strumenti posso utilizzare per il monitoraggio e la creazione di report per gestire i dati inattivi archiviati nel cloud?
+
+Oltre al Cloud Tiering, https://docs.netapp.com/us-en/active-iq-unified-manager/["Active IQ Unified Manager"^] E https://docs.netapp.com/us-en/active-iq/index.html["consulente digitale"^] può essere utilizzato per il monitoraggio e la rendicontazione.
+
+
+
+=== Quali sono le implicazioni se il collegamento di rete al provider cloud si interrompe?
+
+In caso di guasto della rete, il livello di prestazioni locale rimane online e i dati attivi restano accessibili.  Tuttavia, i blocchi che sono già stati spostati nel livello cloud saranno inaccessibili e le applicazioni riceveranno un messaggio di errore quando proveranno ad accedere a tali dati.  Una volta ripristinata la connettività, tutti i dati saranno accessibili senza problemi.
+
+
+
+=== Esiste una raccomandazione sulla larghezza di banda della rete?
+
+La latenza di lettura della tecnologia di tiering FabricPool sottostante dipende dalla connettività al livello cloud.  Sebbene il tiering funzioni su qualsiasi larghezza di banda, si consiglia di posizionare i LIF intercluster su porte da 10 Gbps per garantire prestazioni adeguate.  Non ci sono raccomandazioni o limitazioni di larghezza di banda per l'agente.
+
+Inoltre, è possibile limitare la quantità di larghezza di banda di rete utilizzata durante il trasferimento di dati inattivi dal volume all'archiviazione degli oggetti.  L'impostazione _Velocità di trasferimento massima_ è disponibile durante la configurazione del cluster per la suddivisione in livelli e, successivamente, dalla pagina *Clusters*.
+
+
+
+=== C'è qualche latenza quando un utente tenta di accedere ai dati a livelli?
+
+Sì. I livelli cloud non possono garantire la stessa latenza del livello locale, poiché la latenza dipende dalla connettività.  Per stimare la latenza e la produttività di un archivio oggetti, Cloud Tiering fornisce un Cloud Performance Test (basato sul profiler dell'archivio oggetti ONTAP ) che può essere utilizzato dopo aver collegato l'archivio oggetti e prima di impostare il tiering.
+
+
+
+=== Come vengono protetti i miei dati?
+
+La crittografia AES-256-GCM viene mantenuta sia sui livelli performance che cloud.  La crittografia TLS 1.2 viene utilizzata per crittografare i dati in transito durante lo spostamento tra i livelli e per crittografare la comunicazione tra l'agente e sia il cluster ONTAP che l'archivio oggetti.
+
+
+
+=== Ho bisogno di una porta Ethernet installata e configurata sul mio AFF?
+
+Sì. Un LIF intercluster deve essere configurato su una porta Ethernet, su ciascun nodo all'interno di una coppia HA che ospita volumi con dati che si intende trasferire nel cloud.  Per ulteriori informazioni, consultare la sezione Requisiti del provider cloud presso cui si intende suddividere i dati.
+
+
+
+=== Quali permessi sono richiesti?
+
+* link:task-tiering-onprem-aws.html#set-up-s3-permissions["Per Amazon, sono necessarie autorizzazioni per gestire il bucket S3"] .
+* Per Azure, non sono necessarie autorizzazioni aggiuntive oltre a quelle che è necessario fornire alla console NetApp .
+* link:task-tiering-onprem-gcp.html#preparing-google-cloud-storage["Per Google Cloud, sono necessarie le autorizzazioni di amministratore di archiviazione per un account di servizio che dispone di chiavi di accesso all'archiviazione"] .
+* link:task-tiering-onprem-storagegrid.html#preparing-storagegrid["Per StorageGRID sono necessarie le autorizzazioni S3"] .
+* link:task-tiering-onprem-s3-compat.html#preparing-s3-compatible-object-storage["Per l'archiviazione di oggetti compatibile con S3, sono necessarie le autorizzazioni S3"] .
+

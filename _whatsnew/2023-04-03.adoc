@@ -1,0 +1,15 @@
+= La scheda Licenza è stata rimossa
+:allow-uri-read: 
+
+
+
+
+=== La scheda Licenza è stata rimossa
+
+La scheda Licenze è stata rimossa dall'interfaccia Cloud Tiering.  Ora è possibile accedere a tutte le licenze per gli abbonamenti Pay-as-you-go (PAYGO) dalla dashboard Cloud Tiering On-Premises.  Da quella pagina è presente anche un collegamento al BlueXP digital wallet, in modo da poter visualizzare e gestire qualsiasi licenza BYOL (Bring Your Own License) di Cloud Tiering.
+
+
+
+=== Le schede di suddivisione in livelli sono state rinominate e aggiornate
+
+La scheda "Clusters Dashboard" è stata rinominata "Clusters" e la scheda "On-Prem Overview" è stata rinominata "On-Premises Dashboard".  In queste pagine sono state aggiunte alcune informazioni che ti aiuteranno a valutare se puoi ottimizzare il tuo spazio di archiviazione con una configurazione a livelli aggiuntiva.

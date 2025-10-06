@@ -1,0 +1,17 @@
+= Regola la larghezza di banda per trasferire i dati inattivi
+:allow-uri-read: 
+
+
+
+
+=== Regola la larghezza di banda per trasferire i dati inattivi
+
+Quando si attiva Cloud Tiering, ONTAP può utilizzare una quantità illimitata di larghezza di banda di rete per trasferire i dati inattivi dai volumi nel cluster all'archiviazione degli oggetti.  Se noti che il traffico a livelli influisce sui normali carichi di lavoro degli utenti, puoi limitare la quantità di larghezza di banda che può essere utilizzata durante il trasferimento. https://docs.netapp.com/us-en/bluexp-tiering/task-managing-tiering.html#changing-the-network-bandwidth-available-to-upload-inactive-data-to-object-storage["Saperne di più"] .
+
+
+
+=== Evento di suddivisione in livelli visualizzato nel Centro notifiche
+
+L'evento di suddivisione in livelli "Suddivisione in livelli di dati aggiuntivi dal cluster <nome> all'archiviazione oggetti per aumentare l'efficienza dell'archiviazione" ora viene visualizzato come notifica quando un cluster suddivide in livelli meno del 20% dei suoi dati inattivi, inclusi i cluster che non suddividono in livelli alcun dato.
+
+Questa notifica è una "Raccomandazione" per aiutarti a rendere i tuoi sistemi più efficienti e a risparmiare sui costi di archiviazione.  Fornisce un collegamento al https://bluexp.netapp.com/cloud-tiering-service-tco["Calcolatore del costo totale di proprietà e dei risparmi di Cloud Tiering"^] per aiutarti a calcolare il risparmio sui costi.

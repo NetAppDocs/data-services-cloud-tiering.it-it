@@ -1,0 +1,223 @@
+---
+sidebar: sidebar 
+permalink: task-tiering-onprem-storagegrid.html 
+keywords: data tiering, fabricpool, cloud tiering, tiering cold data, tiering inactive data, tiering aff, tiering fas, tiering ontap, tiering volumes, tier data, tier cold data, tier fas, tier aff, tier ontap, storagegrid, tier to storagegrid, fabricpool storagegrid 
+summary: Libera spazio sui tuoi cluster ONTAP locali suddividendo i dati inattivi in ​​StorageGRID in NetApp Cloud Tiering. 
+---
+= Suddivisione in livelli dei dati dai cluster ONTAP locali a StorageGRID in NetApp Cloud Tiering
+:hardbreaks:
+:allow-uri-read: 
+:nofooter: 
+:icons: font
+:linkattrs: 
+:imagesdir: ./media/
+
+
+[role="lead"]
+Libera spazio sui tuoi cluster ONTAP locali suddividendo i dati inattivi in ​​StorageGRID in NetApp Cloud Tiering.
+
+
+
+== Avvio rapido
+
+Inizia subito seguendo questi passaggi oppure scorri verso il basso fino alle sezioni rimanenti per i dettagli completi.
+
+.image:https://raw.githubusercontent.com/NetAppDocs/common/main/media/number-1.png["Uno"]Prepararsi a suddividere i dati in livelli su StorageGRID
+[role="quick-margin-para"]
+Ti occorre quanto segue:
+
+[role="quick-margin-list"]
+* Un cluster ONTAP locale di origine che esegue ONTAP 9.4 o versione successiva aggiunto alla console NetApp e una connessione tramite una porta specificata dall'utente a StorageGRID. https://docs.netapp.com/us-en/bluexp-ontap-onprem/task-discovering-ontap.html["Scopri come scoprire un cluster"^] .
+* StorageGRID 10.3 o versione successiva con chiavi di accesso AWS dotate di autorizzazioni S3.
+* Un agente Console installato presso la tua sede.
+* Rete per l'agente che consente una connessione HTTPS in uscita al cluster ONTAP , a StorageGRID e al servizio Cloud Tiering.
+
+
+.image:https://raw.githubusercontent.com/NetAppDocs/common/main/media/number-2.png["Due"]Imposta livelli
+[role="quick-margin-para"]
+Nella console NetApp , seleziona un sistema locale, seleziona *Abilita* per Cloud Tiering e segui le istruzioni per suddividere i dati in livelli su StorageGRID.
+
+
+
+== Requisiti
+
+Verifica il supporto per il tuo cluster ONTAP , configura la rete e prepara l'archiviazione degli oggetti.
+
+L'immagine seguente mostra ciascun componente e le connessioni che è necessario predisporre tra di essi:
+
+image:diagram_cloud_tiering_storagegrid.png["Un'immagine dell'architettura che mostra il servizio Cloud Tiering con una connessione all'agente in sede, l'agente con una connessione al cluster ONTAP e una connessione tra il cluster ONTAP e l'archiviazione degli oggetti.  I dati attivi risiedono nel cluster ONTAP , mentre i dati inattivi risiedono nell'archiviazione degli oggetti."]
+
+
+NOTE: La comunicazione tra l'agente e StorageGRID è riservata esclusivamente alla configurazione dell'archiviazione degli oggetti.
+
+
+
+=== Prepara i tuoi cluster ONTAP
+
+I cluster ONTAP devono soddisfare i seguenti requisiti quando si suddividono i dati in livelli su StorageGRID.
+
+Piattaforme ONTAP supportate::
++
+--
+* Quando si utilizza ONTAP 9.8 e versioni successive: è possibile suddividere i dati dai sistemi AFF o dai sistemi FAS con aggregati tutti SSD o tutti HDD.
+* Quando si utilizza ONTAP 9.7 e versioni precedenti: è possibile suddividere in livelli i dati provenienti da sistemi AFF o sistemi FAS con aggregati completamente SSD.
+
+
+--
+Versione ONTAP supportata:: ONTAP 9.4 o successivo
+Licenza:: Quando si suddivide in livelli i dati in StorageGRID , non è richiesta una licenza Cloud Tiering nell'organizzazione NetApp Console, né una licenza FabricPool nel cluster ONTAP .
+Requisiti di rete del cluster::
++
+--
+* Il cluster ONTAP avvia una connessione HTTPS tramite una porta specificata dall'utente al nodo gateway StorageGRID (la porta è configurabile durante la configurazione dei livelli).
++
+ONTAP legge e scrive dati da e verso l'archiviazione di oggetti.  L'archiviazione degli oggetti non si avvia mai, risponde e basta.
+
+* È richiesta una connessione in entrata dall'agente, che deve risiedere presso la tua sede.
++
+Non è richiesta una connessione tra il cluster e il servizio Cloud Tiering.
+
+* È necessario un LIF intercluster su ciascun nodo ONTAP che ospita i volumi che si desidera suddividere in livelli.  Il LIF deve essere associato allo _IPspace_ che ONTAP deve utilizzare per connettersi all'archiviazione degli oggetti.
++
+Quando si imposta il tiering dei dati, Cloud Tiering richiede lo spazio IP da utilizzare.  Dovresti scegliere lo spazio IP a cui è associato ciascun LIF.  Potrebbe trattarsi dello spazio IP "predefinito" o di uno spazio IP personalizzato creato da te.  Scopri di più su https://docs.netapp.com/us-en/ontap/networking/create_a_lif.html["LIF"^] E https://docs.netapp.com/us-en/ontap/networking/standard_properties_of_ipspaces.html["Spazi IP"^] .
+
+
+
+--
+Volumi e aggregati supportati:: Il numero totale di volumi che Cloud Tiering può suddividere in livelli potrebbe essere inferiore al numero di volumi presenti nel sistema ONTAP .  Questo perché i volumi non possono essere suddivisi in livelli da alcuni aggregati.  Fare riferimento alla documentazione ONTAP per https://docs.netapp.com/us-en/ontap/fabricpool/requirements-concept.html#functionality-or-features-not-supported-by-fabricpool["funzionalità o caratteristiche non supportate da FabricPool"^] .
+
+
+
+NOTE: Cloud Tiering supporta i volumi FlexGroup , a partire da ONTAP 9.5.  L'installazione funziona come per qualsiasi altro volume.
+
+
+
+=== Scopri un cluster ONTAP
+
+Prima di poter iniziare a suddividere in livelli i dati inattivi, è necessario aggiungere un sistema ONTAP locale alla console NetApp .
+
+https://docs.netapp.com/us-en/bluexp-ontap-onprem/task-discovering-ontap.html["Scopri come scoprire un cluster"^] .
+
+
+
+=== Prepara StorageGRID
+
+StorageGRID deve soddisfare i seguenti requisiti.
+
+Versioni StorageGRID supportate:: StorageGRID 10.3 e versioni successive sono supportati.
+Credenziali S3:: Quando si imposta il tiering su StorageGRID, è necessario fornire a Cloud Tiering una chiave di accesso S3 e una chiave segreta.  Cloud Tiering utilizza le chiavi per accedere ai tuoi bucket.
++
+--
+Queste chiavi di accesso devono essere associate a un utente che dispone delle seguenti autorizzazioni:
+
+[source, json]
+----
+"s3:ListAllMyBuckets",
+"s3:ListBucket",
+"s3:GetObject",
+"s3:PutObject",
+"s3:DeleteObject",
+"s3:CreateBucket"
+----
+--
+Versionamento degli oggetti:: Non è possibile abilitare il controllo delle versioni degli oggetti StorageGRID sul bucket di archiviazione degli oggetti.
+
+
+
+
+=== Crea o cambia agenti della console
+
+L'agente Console è necessario per suddividere i dati nel cloud.  Quando si suddividono i dati in livelli su StorageGRID, è necessario che un agente sia disponibile presso la sede dell'utente.
+
+Per creare un agente è necessario disporre del ruolo di amministratore dell'organizzazione.
+
+* https://docs.netapp.com/us-en/bluexp-setup-admin/concept-connectors.html["Scopri di più sugli agenti"^]
+* https://docs.netapp.com/us-en/bluexp-setup-admin/task-install-connector-on-prem.html["Installa e configura un agente in sede"^]
+* https://docs.netapp.com/us-en/bluexp-setup-admin/task-manage-multiple-connectors.html#switch-between-connectors["Passa da un agente all'altro"^]
+
+
+
+
+=== Preparare la rete per l'agente della console
+
+Assicurarsi che l'agente disponga delle connessioni di rete richieste.
+
+.Passi
+. Assicurarsi che la rete in cui è installato l'agente consenta le seguenti connessioni:
++
+** Una connessione HTTPS sulla porta 443 al servizio Cloud Tiering(https://docs.netapp.com/us-en/bluexp-setup-admin/task-set-up-networking-on-prem.html#endpoints-contacted-for-day-to-day-operations["vedere l'elenco degli endpoint"^] )
+** Una connessione HTTPS sulla porta 443 al tuo sistema StorageGRID
+** Una connessione HTTPS sulla porta 443 al LIF di gestione del cluster ONTAP
+
+
+
+
+
+
+== Suddividi i dati inattivi dal tuo primo cluster a StorageGRID
+
+Dopo aver preparato l'ambiente, inizia a suddividere in livelli i dati inattivi dal tuo primo cluster.
+
+.Cosa ti servirà
+* https://docs.netapp.com/us-en/bluexp-ontap-onprem/task-discovering-ontap.html["Un sistema on-premise aggiunto alla console NetApp"^] .
+* Il nome di dominio completo (FQDN) del nodo gateway StorageGRID e la porta che verrà utilizzata per le comunicazioni HTTPS.
+* Una chiave di accesso AWS dotata delle autorizzazioni S3 richieste.
+
+
+.Passi
+. Selezionare il sistema ONTAP locale.
+. Fare clic su *Abilita* per Cloud Tiering dal pannello di destra.
++
+Se la destinazione di tiering StorageGRID esiste come sistema nella console NetApp , è possibile trascinare il cluster sul sistema StorageGRID per avviare la procedura guidata di configurazione.
+
++
+image:screenshot_setup_tiering_onprem.png["Uno screenshot che mostra l'opzione Configurazione a livelli che appare sul lato destro dello schermo dopo aver selezionato un sistema ONTAP locale."]
+
+. *Definisci nome archivio oggetti*: inserisci un nome per questo archivio oggetti.  Deve essere univoco rispetto a qualsiasi altro archivio di oggetti che potresti utilizzare con gli aggregati su questo cluster.
+. *Seleziona provider*: seleziona * StorageGRID* e seleziona *Continua*.
+. *Seleziona provider*: seleziona * StorageGRID* e seleziona *Continua*.
+. Completare i passaggi nelle pagine *Crea archiviazione oggetti*:
++
+.. *Server*: immettere l'FQDN del nodo gateway StorageGRID , la porta che ONTAP deve utilizzare per la comunicazione HTTPS con StorageGRID e la chiave di accesso e la chiave segreta per un account che dispone delle autorizzazioni S3 richieste.
+.. *Bucket*: aggiungi un nuovo bucket o seleziona un bucket esistente che inizia con il prefisso _fabric-pool_ e seleziona *Continua*.
+.. *Bucket*: aggiungi un nuovo bucket o seleziona un bucket esistente che inizia con il prefisso _fabric-pool_ e seleziona *Continua*.
++
+Il prefisso _fabric-pool_ è obbligatorio perché il criterio IAM per l'agente consente all'istanza di eseguire azioni S3 sui bucket denominati con quel prefisso esatto.  Ad esempio, è possibile denominare il bucket S3 _fabric-pool-AFF1_, dove AFF1 è il nome del cluster.
+
+.. *Rete cluster*: selezionare lo spazio IP che ONTAP deve utilizzare per connettersi all'archiviazione degli oggetti e selezionare *Continua*.
+.. *Rete cluster*: selezionare lo spazio IP che ONTAP deve utilizzare per connettersi all'archiviazione degli oggetti e selezionare *Continua*.
++
+Selezionando lo spazio IP corretto si garantisce che Cloud Tiering possa impostare una connessione da ONTAP allo storage di oggetti StorageGRID .
+
++
+È anche possibile impostare la larghezza di banda di rete disponibile per caricare dati inattivi nell'archiviazione degli oggetti definendo la "Velocità di trasferimento massima".  Selezionare il pulsante di opzione *Limitato* e immettere la larghezza di banda massima utilizzabile, oppure selezionare *Illimitato* per indicare che non vi è alcun limite.
+
+
+
+. Nella pagina _Volumi a livelli_, seleziona i volumi per i quali desideri configurare la suddivisione in livelli e avvia la pagina Criteri di suddivisione in livelli:
++
+** Per selezionare tutti i volumi, seleziona la casella nella riga del titolo (image:button_backup_all_volumes.png[""] ) e seleziona *Configura volumi*.
+** Per selezionare più volumi, seleziona la casella per ogni volume (image:button_backup_1_volume.png[""] ) e seleziona *Configura volumi*.
+** Per selezionare un singolo volume, selezionare la riga (oimage:screenshot_edit_icon.gif["modifica icona matita"] icona) per il volume.
+** Per selezionare tutti i volumi, seleziona la casella nella riga del titolo (image:button_backup_all_volumes.png[""] ) e seleziona *Configura volumi*.
+** Per selezionare più volumi, seleziona la casella per ogni volume (image:button_backup_1_volume.png[""] ) e seleziona *Configura volumi*.
+** Per selezionare un singolo volume, selezionare la riga (oimage:screenshot_edit_icon.gif["modifica icona matita"] icona) per il volume.
++
+image:screenshot_tiering_initial_volumes.png["Uno screenshot che mostra come selezionare un singolo volume, più volumi o tutti i volumi e il pulsante Modifica volumi selezionati."]
+
+
+
+. Nella finestra di dialogo _Criterio di suddivisione in livelli_, seleziona un criterio di suddivisione in livelli, modifica facoltativamente i giorni di raffreddamento per i volumi selezionati e seleziona *Applica*.
+. Nella finestra di dialogo _Criterio di suddivisione in livelli_, seleziona un criterio di suddivisione in livelli, modifica facoltativamente i giorni di raffreddamento per i volumi selezionati e seleziona *Applica*.
++
+link:concept-cloud-tiering.html#volume-tiering-policies["Scopri di più sulle politiche di suddivisione in livelli di volume e sui giorni di raffreddamento"] .
+
++
+image:screenshot_tiering_initial_policy_settings.png["Uno screenshot che mostra le impostazioni configurabili dei criteri di suddivisione in livelli."]
+
+
+
+.Cosa succederà ora?
+È possibile esaminare le informazioni sui dati attivi e inattivi del cluster. link:task-managing-tiering.html["Scopri di più sulla gestione delle impostazioni di suddivisione in livelli"] .
+
+È anche possibile creare un archivio di oggetti aggiuntivo nei casi in cui si desideri suddividere i dati da determinati aggregati su un cluster in archivi di oggetti diversi.  Oppure se si prevede di utilizzare FabricPool Mirroring, in cui i dati a livelli vengono replicati in un archivio oggetti aggiuntivo. link:task-managing-object-storage.html["Scopri di più sulla gestione degli archivi di oggetti"] .

@@ -1,0 +1,68 @@
+---
+settings:
+  name: NetApp Cloud Tiering
+  platform: cloud
+  internal:
+    pdf_enabled: true
+  prod:
+    pdf_enabled: true
+    harmony_enabled: false
+  rss_page: whats-new.html
+  langs: it-it,us-en,de-de,es-es,fr-fr,pt-br,ja-jp,ko-kr,zh-cn,zh-tw
+sidebar:
+  entries:
+  - title: Documentazione di NetApp Cloud Tiering
+    url: "/index.html"
+  - title: Note di rilascio
+    url: "/whats-new.html"
+  - title: Iniziare
+    entries:
+    - title: Scopri di più su NetApp Cloud Tiering
+      url: "/concept-cloud-tiering.html"
+    - title: Trasferisci i dati on-premise al cloud
+      entries:
+      - title: Passaggio ad Amazon S3
+        url: "/task-tiering-onprem-aws.html"
+      - title: Passaggio a livello di archiviazione BLOB di Azure
+        url: "/task-tiering-onprem-azure.html"
+      - title: Passaggio a Google Cloud Storage
+        url: "/task-tiering-onprem-gcp.html"
+      - title: Livello per StorageGRID
+        url: "/task-tiering-onprem-storagegrid.html"
+      - title: Archiviazione di oggetti da livello a S3
+        url: "/task-tiering-onprem-s3-compat.html"
+    - title: Impostare la licenza
+      url: "/task-licensing-cloud-tiering.html"
+    - title: Domande frequenti
+      url: "/faq-cloud-tiering.html"
+  - title: Utilizzare NetApp Cloud Tiering
+    entries:
+    - title: Gestire la suddivisione in livelli dei dati
+      url: "/task-managing-tiering.html"
+    - title: Gestire l'archiviazione degli oggetti
+      url: "/task-managing-object-storage.html"
+    - title: Testare le prestazioni del cloud
+      url: "/task-tiering-test.html"
+    - title: Visualizza la panoramica dei livelli per tutti i cluster
+      url: "/task-tiering-onprem-overview.html"
+    - title: Monitorare lo stato degli avvisi di suddivisione in livelli
+      url: "/task-monitor-tiering-alerts.html"
+  - title: Riferimento
+    entries:
+    - title: Classi e regioni di archiviazione Amazon S3 supportate
+      url: "/reference-aws-support.html"
+    - title: Livelli e regioni di accesso di Azure supportati
+      url: "/reference-azure-support.html"
+    - title: Classi e regioni di archiviazione Google Cloud supportate
+      url: "/reference-google-support.html"
+  - title: Conoscenza e supporto
+    entries:
+    - title: Registrati per ricevere supporto
+      url: "/task-support-registration.html"
+    - title: Ottieni aiuto
+      url: "/task-get-help.html"
+  - title: Note legali
+    url: "/legal-notices.html"
+product-family:
+  name: NetApp Data Services
+  repo: data-services-family

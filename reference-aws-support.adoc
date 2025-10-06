@@ -1,0 +1,81 @@
+---
+sidebar: sidebar 
+permalink: reference-aws-support.html 
+keywords: aws, amazon, s3, support, regions, storage classes, cloud tiering, tiering, bluexp, netapp 
+summary: NetApp Cloud Tiering supporta diverse classi di storage S3 e la maggior parte delle regioni. 
+---
+= Classi e regioni di archiviazione S3 supportate per NetApp Cloud Tiering
+:hardbreaks:
+:allow-uri-read: 
+:nofooter: 
+:icons: font
+:linkattrs: 
+:imagesdir: ./media/
+
+
+[role="lead"]
+NetApp Cloud Tiering supporta diverse classi di storage S3 e la maggior parte delle regioni.
+
+
+
+== Classi di archiviazione S3 supportate
+
+Quando si configura il tiering dei dati su AWS dai sistemi ONTAP locali, Cloud Tiering utilizza automaticamente la classe di archiviazione _Standard_ per i dati inattivi.  Cloud Tiering può applicare una regola del ciclo di vita in modo che i dati passino dalla classe di archiviazione _Standard_ a un'altra classe di archiviazione dopo un certo numero di giorni.  È possibile scegliere tra le seguenti classi di archiviazione:
+
+* Accesso standard-non frequente (S3 Standard-IA)
+* Una zona - Accesso non frequente (S3 Una zona - IA)
+* Intelligent-Tiering (S3 Intelligent-Tiering)
+* Recupero istantaneo del ghiacciaio
+
+
+Se non si sceglie un'altra classe di archiviazione, i dati rimangono nella classe di archiviazione _Standard_ e non vengono applicate regole.
+
+Quando si configura una regola del ciclo di vita di Cloud Tiering, non è necessario configurare alcuna regola del ciclo di vita quando si imposta il bucket nel proprio account AWS.
+
+https://aws.amazon.com/s3/storage-classes/["Scopri di più sulle classi di archiviazione S3"^] .
+
+
+
+== Regioni AWS supportate
+
+Cloud Tiering supporta le seguenti regioni AWS.
+
+
+
+=== Asia Pacifico
+
+* Mumbai
+* Seul
+* Singapore
+* Sidney
+* Tokio
+
+
+
+
+=== Europa
+
+* Francoforte
+* Irlanda
+* Londra
+* Parigi
+* Stoccolma
+
+
+
+
+=== America del Nord
+
+* Canada Centrale
+* Stati Uniti orientali (Virginia settentrionale)
+* Stati Uniti orientali (Ohio)
+* Stati Uniti occidentali (California settentrionale)
+* Stati Uniti occidentali (Oregon)
+
+
+
+
+=== Sud America
+
+* San Paolo
+

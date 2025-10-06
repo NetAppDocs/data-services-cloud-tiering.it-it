@@ -1,0 +1,35 @@
+---
+sidebar: sidebar 
+permalink: reference-azure-support.html 
+keywords: microsoft azure, azure, hot, access tier, cold, regions, cloud tiering, tier, bluexp 
+summary: NetApp Cloud Tiering supporta due livelli di accesso e la maggior parte delle regioni. 
+---
+= Livelli e regioni di accesso Azure Blob supportati per NetApp Cloud Tiering
+:hardbreaks:
+:allow-uri-read: 
+:nofooter: 
+:icons: font
+:linkattrs: 
+:imagesdir: ./media/
+
+
+[role="lead"]
+NetApp Cloud Tiering supporta due livelli di accesso e la maggior parte delle regioni.
+
+
+
+== Livelli di accesso supportati ad Azure Blob
+
+Quando si configura il livello di dati su Azure dai sistemi ONTAP locali, Cloud Tiering utilizza automaticamente il livello di accesso _Hot_ per i dati inattivi.  Cloud Tiering può applicare una regola del ciclo di vita in modo che i dati passino dal livello di accesso _Hot_ al livello di accesso _Cool_ dopo un certo numero di giorni.
+
+Se non si sceglie il livello di accesso _Cool_, i dati rimangono nel livello di accesso _Hot_ e non vengono applicate regole.
+
+Quando si configura una regola del ciclo di vita di Cloud Tiering, non è necessario configurare alcuna regola del ciclo di vita durante la configurazione del contenitore nel proprio account Azure.
+
+https://docs.microsoft.com/en-us/azure/storage/blobs/access-tiers-overview["Scopri di più sui livelli di accesso di Azure Blob"^] .
+
+
+
+== Regioni di Azure supportate
+
+Il Cloud Tiering è supportato in tutte le regioni di Azure, ad eccezione della Cina, dove Microsoft Azure è gestito da 21Vianet.

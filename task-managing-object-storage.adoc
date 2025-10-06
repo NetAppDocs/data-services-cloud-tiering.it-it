@@ -1,0 +1,168 @@
+---
+sidebar: sidebar 
+permalink: task-managing-object-storage.html 
+keywords: object storage, mirror object storage, create object storage, remove object storage, swap object storage, display object storage, license 
+summary: 'Dopo aver configurato i cluster ONTAP locali per suddividere i dati in livelli in uno specifico storage di oggetti, è possibile eseguire ulteriori attività di storage di oggetti in NetApp Cloud Tiering.  È possibile aggiungere un nuovo archivio di oggetti, eseguire il mirroring dei dati a livelli su un archivio di oggetti secondario, scambiare l"archivio di oggetti primario e mirror, rimuovere un archivio di oggetti mirror da un aggregato e molto altro.' 
+---
+= Gestisci l'archiviazione degli oggetti utilizzata per il tiering dei dati in NetApp Cloud Tiering
+:hardbreaks:
+:allow-uri-read: 
+:nofooter: 
+:icons: font
+:linkattrs: 
+:imagesdir: ./media/
+
+
+[role="lead"]
+Dopo aver configurato i cluster ONTAP locali per suddividere i dati in livelli in uno specifico storage di oggetti, è possibile eseguire ulteriori attività di storage di oggetti utilizzando NetApp Cloud Tiering.  È possibile aggiungere un nuovo archivio di oggetti, eseguire il mirroring dei dati a livelli su un archivio di oggetti secondario, scambiare l'archivio di oggetti primario e mirror, rimuovere un archivio di oggetti mirror da un aggregato e molto altro.
+
+
+
+== Visualizza gli archivi di oggetti configurati per un cluster
+
+È possibile visualizzare tutti gli archivi di oggetti configurati per ciascun cluster e a quali aggregati sono collegati.
+
+.Passi
+. Dalla pagina *Cluster*, seleziona l'icona del menu per un cluster e seleziona *Informazioni sull'archivio oggetti*.
+. Dalla pagina *Cluster*, seleziona l'icona del menu per un cluster e seleziona *Informazioni sull'archivio oggetti*.
+. Esaminare i dettagli sugli archivi di oggetti.
++
+Questo esempio mostra un archivio di oggetti Amazon S3 e Azure Blob collegati a diversi aggregati su un cluster.
+
++
+image:screenshot_tiering_object_store_view.png["Uno screenshot che mostra le informazioni sull'archiviazione degli oggetti, che specificano la capacità totale utilizzata, l'aggregato allegato all'archivio oggetti, il nome dell'archivio oggetti e altre informazioni."]
+
+
+
+
+
+== Aggiungi un nuovo archivio oggetti
+
+È possibile aggiungere un nuovo archivio oggetti per gli aggregati nel cluster.  Dopo averlo creato, puoi allegarlo a un aggregato.
+
+.Passi
+. Dalla pagina *Cluster*, seleziona l'icona del menu per un cluster e seleziona *Informazioni sull'archivio oggetti*.
+. Dalla pagina *Cluster*, seleziona l'icona del menu per un cluster e seleziona *Informazioni sull'archivio oggetti*.
+. Dalla pagina Informazioni sull'archivio oggetti, seleziona *Crea nuovo archivio oggetti*.
+. Dalla pagina Informazioni sull'archivio oggetti, seleziona *Crea nuovo archivio oggetti*.
++
+image:screenshot_tiering_object_store_create_button.png["Uno screenshot che mostra il pulsante Crea nuovo archivio oggetti per creare un nuovo archivio oggetti."]
+
++
+Viene avviata la procedura guidata per l'archiviazione degli oggetti.  L'esempio seguente mostra come creare un archivio oggetti in Amazon S3.
+
+. *Definisci nome archivio oggetti*: inserisci un nome per questo archivio oggetti.  Deve essere univoco rispetto a qualsiasi altro archivio di oggetti che potresti utilizzare con gli aggregati su questo cluster.
+. *Seleziona fornitore*: seleziona il fornitore, ad esempio *Amazon Web Services*, e seleziona *Continua*.
+. Completare i passaggi nelle pagine *Crea archiviazione oggetti*:
++
+.. *Bucket S3*: aggiungi un nuovo bucket S3 o seleziona un bucket S3 esistente che inizia con il prefisso _fabric-pool_.  Quindi inserisci l'ID dell'account AWS che fornisce l'accesso al bucket, seleziona la regione del bucket e seleziona *Continua*.
++
+Il prefisso _fabric-pool_ è obbligatorio perché il criterio IAM per l'agente Console consente all'istanza di eseguire azioni S3 sui bucket denominati con quel prefisso esatto.  Ad esempio, è possibile denominare il bucket S3 _fabric-pool-AFF1_, dove AFF1 è il nome del cluster.
+
+.. *Ciclo di vita della classe di archiviazione*: Cloud Tiering gestisce le transizioni del ciclo di vita dei dati suddivisi in livelli.  I dati iniziano nella classe _Standard_, ma è possibile creare una regola per applicare una classe di archiviazione diversa ai dati dopo un certo numero di giorni.
++
+Selezionare la classe di archiviazione S3 in cui si desidera trasferire i dati a livelli e il numero di giorni prima che i dati vengano assegnati a tale classe, quindi selezionare *Continua*.  Ad esempio, lo screenshot seguente mostra che i dati a livelli vengono assegnati alla classe _Standard-IA_ dalla classe _Standard_ dopo 45 giorni nell'archiviazione degli oggetti.
+
++
+Se si sceglie *Mantieni i dati in questa classe di archiviazione*, i dati rimangono nella classe di archiviazione _Standard_ e non vengono applicate regole. link:reference-aws-support.html["Visualizza le classi di archiviazione supportate"^] .
+
++
+image:screenshot_tiering_lifecycle_selection_aws.png["Uno screenshot che mostra come selezionare un'altra classe di archiviazione assegnata ai dati dopo un certo numero di giorni."]
+
++
+Si noti che la regola del ciclo di vita viene applicata a tutti gli oggetti nel bucket selezionato.
+
+.. *Credenziali*: immettere l'ID della chiave di accesso e la chiave segreta per un utente IAM che dispone delle autorizzazioni S3 richieste e selezionare *Continua*.
++
+L'utente IAM deve trovarsi nello stesso account AWS del bucket selezionato o creato nella pagina *S3 Bucket*.  Consultare le autorizzazioni richieste nella sezione relativa all'attivazione della suddivisione in livelli.
+
+.. *Rete cluster*: selezionare lo spazio IP che ONTAP deve utilizzare per connettersi all'archiviazione degli oggetti e selezionare *Continua*.
++
+Selezionando lo spazio IP corretto si garantisce che Cloud Tiering possa impostare una connessione da ONTAP allo storage degli oggetti del provider cloud.
+
+
+
+
+
+Viene creato l'archivio oggetti.
+
+Ora puoi collegare l'archivio oggetti a un aggregato nel tuo cluster.
+
+
+
+== Collegare un secondo archivio oggetti a un aggregato per il mirroring
+
+È possibile collegare un secondo archivio oggetti a un aggregato per creare un mirror FabricPool per suddividere in livelli sincroni i dati in due archivi oggetti.  È necessario che un archivio oggetti sia già collegato all'aggregato. https://docs.netapp.com/us-en/ontap/fabricpool/create-mirror-task.html["Scopri di più sugli specchi FabricPool"^] .
+
+Quando si utilizza una configurazione MetroCluster , è consigliabile utilizzare archivi di oggetti nel cloud pubblico che si trovano in zone di disponibilità diverse. https://docs.netapp.com/us-en/ontap/fabricpool/setup-object-stores-mcc-task.html["Per saperne di più sui requisiti di MetroCluster , consulta la documentazione ONTAP"^] .  All'interno di un MetroCluster, non è consigliabile utilizzare aggregati non speculari, poiché ciò causerebbe un messaggio di errore.
+
+Quando si utilizza StorageGRID come archivio oggetti in una configurazione MetroCluster , entrambi i sistemi ONTAP possono eseguire il tiering FabricPool su un singolo sistema StorageGRID .  Ogni sistema ONTAP deve suddividere i dati in diversi bucket.
+
+.Passi
+. Dalla pagina *Cluster*, seleziona *Configurazione avanzata* per il cluster selezionato.
++
+image:screenshot_tiering_advanced_setup_button.png["Uno screenshot che mostra il pulsante Configurazione avanzata per un cluster."]
+
+. Dalla pagina Configurazione avanzata, trascinare l'archivio oggetti che si desidera utilizzare nella posizione dell'archivio oggetti mirror.
++
+image:screenshot_tiering_mirror_config.png["Uno screenshot che mostra come trascinare un secondo archivio oggetti su un aggregato per creare uno specchio a livelli."]
+
+. Nella finestra di dialogo Allega archivio oggetti, seleziona *Allega* e il secondo archivio oggetti verrà allegato all'aggregato.
++
+image:screenshot_tiering_mirror_config_complete.png["Uno screenshot che mostra un secondo archivio oggetti collegato a un aggregato."]
+
+
+
+Lo stato Mirror apparirà come "Sincronizzazione in corso" mentre i 2 archivi di oggetti sono in fase di sincronizzazione.  Una volta completata la sincronizzazione, lo stato cambierà in "Sincronizzato".
+
+
+
+== Scambia l'archivio oggetti primario e mirror
+
+È possibile scambiare l'archivio oggetti primario e mirror con un aggregato.  Lo specchio dell'archivio oggetti diventa primario e il primario originale diventa lo specchio.
+
+.Passi
+. Dalla pagina *Cluster*, seleziona *Configurazione avanzata* per il cluster selezionato.
++
+image:screenshot_tiering_advanced_setup_button.png["Uno screenshot che mostra il pulsante Configurazione avanzata per un cluster."]
+
+. Dalla pagina Configurazione avanzata, seleziona l'icona del menu per l'aggregato e seleziona *Scambia destinazioni*.
++
+image:screenshot_tiering_mirror_swap.png["Uno screenshot che mostra l'opzione Destinazione di scambio per un aggregato."]
+
+. Approvare l'azione nella finestra di dialogo e gli archivi degli oggetti primari e mirror verranno scambiati.
+
+
+
+
+== Rimuovere un archivio di oggetti mirror da un aggregato
+
+È possibile rimuovere un mirror FabricPool se non è più necessario replicare su un archivio oggetti aggiuntivo.
+
+.Passi
+. Dalla pagina *Cluster*, seleziona *Configurazione avanzata* per il cluster selezionato.
++
+image:screenshot_tiering_advanced_setup_button.png["Uno screenshot che mostra il pulsante Configurazione avanzata per un cluster."]
+
+. Dalla pagina Configurazione avanzata, seleziona l'icona del menu per l'aggregato e seleziona *Annulla mirroring archivio oggetti*.
++
+image:screenshot_tiering_mirror_delete.png["Uno screenshot che mostra l'opzione Unmirror Object Store per un aggregato."]
+
+
+
+L'archivio oggetti mirror viene rimosso dall'aggregato e i dati a livelli non vengono più replicati.
+
+
+NOTE: Quando si rimuove l'archivio oggetti mirror da una configurazione MetroCluster , verrà chiesto se si desidera rimuovere anche l'archivio oggetti primario.  È possibile scegliere di mantenere l'archivio oggetti primario collegato all'aggregato oppure di rimuoverlo.
+
+
+
+== Migra i tuoi dati a livelli verso un diverso provider cloud
+
+Cloud Tiering ti consente di migrare facilmente i tuoi dati suddivisi in livelli verso un diverso provider cloud.  Ad esempio, se si desidera passare da Amazon S3 ad Azure Blob, è possibile seguire i passaggi elencati sopra in questo ordine:
+
+. Aggiungere un archivio oggetti BLOB di Azure.
+. Collegare questo nuovo archivio oggetti come mirror all'aggregato esistente.
+. Scambia gli archivi degli oggetti primari e mirror.
+. Annullare il mirroring dell'archivio oggetti Amazon S3.
+

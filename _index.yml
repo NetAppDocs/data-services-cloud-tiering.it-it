@@ -1,0 +1,62 @@
+---
+indexpage:
+  title: Documentazione di NetApp Cloud Tiering
+  summary: NetApp Cloud Tiering estende il tuo data center al cloud suddividendo automaticamente
+    i dati inattivi dai cluster ONTAP locali allo storage di oggetti.
+  keywords: bluexp, ontap, cloud tiering, documentation, netapp console, console
+  lead: NetApp Cloud Tiering estende il tuo data center al cloud suddividendo automaticamente
+    i dati inattivi dai cluster ONTAP locali allo storage di oggetti.
+  tiles:
+  - title: Iniziare
+    links:
+    - title: Scopri di più su NetApp Cloud Tiering
+      url: concept-cloud-tiering.html
+    - title: Cosa c'è di nuovo
+      url: whats-new.html
+    - title: Impostare la licenza
+      url: task-licensing-cloud-tiering.html
+  - title: Trasferisci i dati ONTAP locali al cloud
+    links:
+    - title: Passaggio ad Amazon S3
+      url: task-tiering-onprem-aws.html
+    - title: Livello per Azure Blob
+      url: task-tiering-onprem-azure.html
+    - title: Passaggio a Google Cloud
+      url: task-tiering-onprem-gcp.html
+    - title: Livello per StorageGRID
+      url: task-tiering-onprem-storagegrid.html
+    - title: Livello per S3 generico
+      url: task-tiering-onprem-s3-compat.html
+  - title: Gestisci le impostazioni di suddivisione in livelli
+    links:
+    - title: Modificare la politica di suddivisione in livelli di un volume
+      url: task-managing-tiering.html#changing-a-volumes-tiering-policy
+    - title: Esaminare le informazioni di suddivisione in livelli per un cluster
+      url: task-managing-tiering.html#reviewing-tiering-info-for-a-cluster
+    - title: Dati di livello da volumi aggiuntivi
+      url: task-managing-tiering.html#tiering-data-from-additional-volumes
+    - title: Modifica la larghezza di banda per caricare i dati inattivi nell'archiviazione
+        degli oggetti
+      url: task-managing-tiering.html#changing-the-network-bandwidth-available-to-upload-inactive-data-to-object-storage
+    - title: Spostare i dati dal cloud al livello di prestazioni
+      url: task-managing-tiering.html#migrating-data-from-the-cloud-tier-back-to-the-performance-tier
+    - title: Gestire le impostazioni di tiering sugli aggregati
+      url: task-managing-tiering.html#managing-tiering-settings-on-aggregates
+  - title: Gestire l'archiviazione degli oggetti
+    links:
+    - title: Aggiungere un nuovo archivio oggetti per un cluster
+      url: task-managing-object-storage.html#adding-a-new-object-store
+    - title: Aggiungere un secondo archivio oggetti a un aggregato per il mirroring
+      url: task-managing-object-storage.html#attaching-a-second-object-store-to-an-aggregate-for-mirroring
+    - title: Scambia l'archivio oggetti primario e mirror
+      url: task-managing-object-storage.html#swapping-the-primary-and-mirror-object-store
+    - title: Rimuovere un archivio di oggetti mirror
+      url: task-managing-object-storage.html#removing-a-mirror-object-store-from-an-aggregate
+  - title: Blog e comunità
+    links:
+    - title: Console NetApp
+      url: https://www.netapp.com/console
+    - title: Servizi dati NetApp
+      url: https://www.netapp.com/data-services/
+    - title: Comunità NetApp
+      url: https://community.netapp.com/

@@ -1,0 +1,29 @@
+---
+sidebar: sidebar 
+permalink: task-monitor-tiering-alerts.html 
+keywords: tiering, status, monitor, alert, notification, cloud tiering, bluexp 
+summary: È possibile visualizzare lo stato degli avvisi di suddivisione in livelli nel Centro notifiche della console NetApp . 
+---
+= Monitora lo stato degli avvisi di tiering da NetApp Cloud Tiering
+:hardbreaks:
+:allow-uri-read: 
+:nofooter: 
+:icons: font
+:linkattrs: 
+:imagesdir: ./media/
+
+
+[role="lead"]
+È possibile visualizzare lo stato degli avvisi di tiering da NetApp Cloud Tiering nel Centro notifiche della console NetApp .
+
+Il Centro notifiche tiene traccia dell'avanzamento degli incidenti di suddivisione in livelli, in modo da poter verificare se sono stati risolti o meno.  È possibile visualizzare le notifiche selezionando (image:icon_bell.png["campanello di notifica"] ) nella barra dei menu della Console.
+
+Al momento, c'è un evento di suddivisione in livelli che apparirà come notifica:
+
+Suddividere i dati aggiuntivi dal cluster <nome> nell'archiviazione degli oggetti per risparmiare spazio di archiviazione
+
+Questa notifica è una "Raccomandazione" per migliorare l'efficienza del sistema e ridurre i costi di archiviazione.  Indica che un cluster sta suddividendo in livelli meno del 20% dei suoi dati inattivi, compresi i cluster che non stanno suddividendo in livelli alcun dato.  Fornisce un collegamento al https://bluexp.netapp.com/cloud-tiering-service-tco["Calcolatore del costo totale di proprietà e dei risparmi di Cloud Tiering"^] per aiutarti a calcolare il risparmio sui costi.
+
+La console NetApp non invia un'e-mail per questa notifica.
+
+https://docs.netapp.com/us-en/bluexp-setup-admin/task-monitor-cm-operations.html["Scopri di più sul Centro notifiche"^] .

@@ -1,0 +1,15 @@
+= Utilizza un prefisso personalizzato per il nome del bucket
+:allow-uri-read: 
+
+
+
+
+=== Utilizza un prefisso personalizzato per il nome del bucket
+
+In passato era necessario utilizzare il prefisso predefinito "fabric-pool" per definire il nome del bucket, ad esempio _fabric-pool-bucket1_. Ora puoi usare un prefisso personalizzato quando assegni un nome al tuo bucket. Questa funzionalità è disponibile solo quando si suddividono i dati in livelli su Amazon S3. https://docs.netapp.com/us-en/bluexp-tiering/task-tiering-onprem-aws.html#prepare-your-aws-environment["Saperne di più"] .
+
+
+
+=== Cerca un cluster in tutti i connettori BlueXP
+
+Se si utilizzano più connettori per gestire tutti i sistemi di archiviazione nel proprio ambiente, alcuni cluster su cui si desidera implementare la suddivisione in livelli potrebbero trovarsi in connettori diversi. Se non sei sicuro di quale connettore gestisca un determinato cluster, puoi effettuare una ricerca tra tutti i connettori utilizzando Cloud Tiering. https://docs.netapp.com/us-en/bluexp-tiering/task-managing-tiering.html#search-for-a-cluster-across-all-bluexp-connectors["Saperne di più"] .

@@ -1,0 +1,6 @@
+= 
+:allow-uri-read: 
+
+
+Volumi e aggregati supportati:: Il numero totale di volumi che Cloud Tiering può suddividere in livelli potrebbe essere inferiore al numero di volumi presenti nel sistema ONTAP .  Questo perché i volumi non possono essere suddivisi in livelli da alcuni aggregati.  Fare riferimento alla documentazione ONTAP per https://docs.netapp.com/us-en/ontap/fabricpool/requirements-concept.html#functionality-or-features-not-supported-by-fabricpool["funzionalità o caratteristiche non supportate da FabricPool"^] .
+

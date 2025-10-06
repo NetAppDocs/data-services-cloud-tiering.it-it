@@ -1,0 +1,288 @@
+---
+sidebar: sidebar 
+permalink: task-managing-tiering.html 
+keywords: discover, volumes, report, hot, cold, inactive, active, capacity, used capacity, savings, health, failed, console 
+summary: Ora che hai configurato la suddivisione in livelli dei dati dai tuoi cluster ONTAP locali, puoi suddividere in livelli i dati da volumi aggiuntivi, modificare i criteri di suddivisione in livelli di un volume, scoprire cluster aggiuntivi e altro ancora. 
+---
+= Gestisci il tiering dei dati per i tuoi cluster in NetApp Cloud Tiering
+:hardbreaks:
+:allow-uri-read: 
+:nofooter: 
+:icons: font
+:linkattrs: 
+:imagesdir: ./media/
+
+
+[role="lead"]
+Ora che hai configurato la suddivisione in livelli dei dati dai tuoi cluster ONTAP locali, puoi suddividere in livelli i dati da volumi aggiuntivi, modificare la policy di suddivisione in livelli di un volume, scoprire cluster aggiuntivi e altro ancora utilizzando NetApp Cloud Tiering.
+
+
+
+== Esaminare le informazioni di suddivisione in livelli per un cluster
+
+Controllare i dati nel livello cloud, sui dischi o la quantità di dati attivi e passivi sui dischi del cluster.  Oppure potresti voler vedere la quantità di dati attivi e passivi sui dischi del cluster.  Cloud Tiering fornisce queste informazioni per ogni cluster.
+
+.Passi
+. Dal menu di navigazione a sinistra, seleziona *Mobilità > Cloud Tiering*.
+. Dalla pagina *Cluster*, seleziona l'icona del menuimage:icon-action.png["Icona Azioni"] per un cluster e seleziona *Informazioni cluster*.
++
+image:screenshot_tiering_cluster_info_button.png["Uno screenshot della selezione del pulsante Informazioni cluster dalla pagina Cluster."]
+
+. Esaminare i dettagli sul cluster.
++
+Ecco un esempio:
+
++
+image:screenshot_tiering_cluster_info.png["Uno screenshot che mostra la capacità dati totale utilizzata dal cluster, la capacità utilizzata dal cluster e le informazioni sul cluster."]
+
+
+
+Si noti che la visualizzazione è diversa per i sistemi Cloud Volumes ONTAP .  Sebbene i volumi Cloud Volumes ONTAP possano avere dati suddivisi in livelli nel cloud, non utilizzano il servizio Cloud Tiering. https://docs.netapp.com/us-en/bluexp-cloud-volumes-ontap/task-tiering.html["Scopri come suddividere i dati inattivi dai sistemi Cloud Volumes ONTAP all'archiviazione di oggetti a basso costo"^] .
+
+Puoi anche https://docs.netapp.com/us-en/active-iq/task-informed-decisions-based-on-cloud-recommendations.html#tiering["visualizzare le informazioni di tiering per un cluster da Active IQ Digital Advisor (noto anche come Digital Advisor)"^] se hai familiarità con questo prodotto NetApp .  Selezionare *Raccomandazioni cloud* dal riquadro di navigazione a sinistra.
+
+image:screenshot_tiering_aiq_fabricpool_info.png["Uno screenshot che mostra le informazioni FabricPool per un cluster utilizzando FabricPool Advisor di Digital Advisor."]
+
+
+
+== Dati di livello da volumi aggiuntivi
+
+È possibile impostare la suddivisione in livelli dei dati per volumi aggiuntivi in qualsiasi momento, ad esempio dopo aver creato un nuovo volume.
+
+
+TIP: Non è necessario configurare l'archiviazione degli oggetti perché è già stata configurata quando è stato inizialmente impostato il tiering per il cluster.  ONTAP suddivide i dati inattivi da eventuali volumi aggiuntivi nello stesso archivio oggetti.
+
+.Passi
+. Dal menu di navigazione a sinistra, seleziona *Mobilità > Cloud Tiering*.
+. Dalla pagina *Cluster*, seleziona *Volumi a livelli* per il cluster.
++
+image:screenshot_tiering_tier_volumes_button.png["Uno screenshot che mostra come selezionare il pulsante Tier Volumi per un cluster."]
+
+. Nella pagina _Volumi a livelli_, seleziona i volumi per i quali desideri configurare la suddivisione in livelli e avvia la pagina Criteri di suddivisione in livelli:
++
+** Per selezionare tutti i volumi, seleziona la casella nella riga del titolo (image:button_backup_all_volumes.png[""] ) e seleziona *Configura volumi*.
+** Per selezionare più volumi, seleziona la casella per ogni volume (image:button_backup_1_volume.png[""] ) e seleziona *Configura volumi*.
+** Per selezionare un singolo volume, selezionare la riga (oimage:screenshot_edit_icon.gif["modifica icona matita"] icona) per il volume.
++
+image:screenshot_tiering_tier_volumes.png["Uno screenshot che mostra come selezionare un singolo volume, più volumi o tutti i volumi e il pulsante per modificare i volumi selezionati."]
+
+
+
+. Nella finestra di dialogo _Criterio di suddivisione in livelli_, seleziona un criterio di suddivisione in livelli, modifica facoltativamente i giorni di raffreddamento per i volumi selezionati e seleziona *Applica*.
+. Nella finestra di dialogo _Criterio di suddivisione in livelli_, seleziona un criterio di suddivisione in livelli, modifica facoltativamente i giorni di raffreddamento per i volumi selezionati e seleziona *Applica*.
++
+link:concept-cloud-tiering.html#volume-tiering-policies["Scopri di più sulle politiche di suddivisione in livelli di volume e sui giorni di raffreddamento"] .
+
++
+image:screenshot_tiering_policy_settings.png["Uno screenshot che mostra le impostazioni configurabili dei criteri di suddivisione in livelli."]
+
+
+
+.Risultato
+ONTAP inizia a suddividere i dati dei volumi selezionati nel cloud.
+
+
+
+== Modificare la politica di suddivisione in livelli di un volume
+
+La modifica della politica di suddivisione in livelli per un volume modifica il modo in cui ONTAP suddivide i dati inattivi nell'archiviazione degli oggetti.  Il cambiamento inizia dal momento in cui si modifica la polizza.  Modifica solo il comportamento di suddivisione in livelli successivi per il volume, senza spostare retroattivamente i dati al livello cloud.
+
+.Passi
+. Dal menu di navigazione a sinistra, seleziona *Mobilità > CloudTiering*.
+. Dalla pagina *Cluster*, seleziona *Volumi a livelli* per il cluster.
+. Dalla pagina *Cluster*, seleziona *Volumi a livelli* per il cluster.
+. Fare clic sulla riga di un volume, selezionare un criterio di suddivisione in livelli, modificare facoltativamente i giorni di raffreddamento e selezionare *Applica*.
+. Fare clic sulla riga di un volume, selezionare un criterio di suddivisione in livelli, modificare facoltativamente i giorni di raffreddamento e selezionare *Applica*.
++
+link:concept-cloud-tiering.html#volume-tiering-policies["Scopri di più sulle politiche di suddivisione in livelli di volume e sui giorni di raffreddamento"] .
+
++
+image:screenshot_tiering_policy_settings.png["Uno screenshot che mostra le impostazioni configurabili dei criteri di suddivisione in livelli."]
+
+
+
+
+NOTE: Se vedi le opzioni per "Recupera dati a livelli", vedi<<Migrare i dati dal livello cloud al livello delle prestazioni,Migrare i dati dal livello cloud al livello delle prestazioni>> per i dettagli.
+
+.Risultato
+ONTAP modifica la politica di suddivisione in livelli e inizia a suddividere i dati in livelli in base alla nuova politica.
+
+
+
+== Modifica la larghezza di banda di rete disponibile per caricare i dati inattivi nell'archiviazione degli oggetti
+
+Quando si attiva Cloud Tiering per un cluster, per impostazione predefinita ONTAP può utilizzare una quantità illimitata di larghezza di banda per trasferire i dati inattivi dai volumi nel sistema all'archiviazione degli oggetti.  Se il traffico suddiviso in livelli influisce sui carichi di lavoro degli utenti, limitare la larghezza di banda di rete utilizzata durante il trasferimento.  È possibile scegliere un valore compreso tra 1 e 10.000 Mbps come velocità di trasferimento massima.
+
+. Dal menu di navigazione a sinistra, seleziona *Mobilità > Livelli*.
+. Dalla pagina *Cluster*, seleziona l'icona del menuimage:icon-action.png["Icona Azioni"] per un cluster e seleziona *Velocità di trasferimento massima*.
+. Dalla pagina *Cluster*, seleziona l'icona del menuimage:icon-action.png["Icona Azioni"] per un cluster e seleziona *Velocità di trasferimento massima*.
++
+image:screenshot_tiering_transfer_rate_button.png["Uno screenshot della selezione del pulsante Velocità di trasferimento massima dalla pagina Cluster."]
+
+. Nella pagina _Velocità di trasferimento massima_, seleziona il pulsante di opzione *Limitata* e inserisci la larghezza di banda massima che può essere utilizzata, oppure seleziona *Illimitata* per indicare che non ci sono limiti.  Quindi seleziona *Applica*.
+. Nella pagina _Velocità di trasferimento massima_, seleziona il pulsante di opzione *Limitata* e inserisci la larghezza di banda massima che può essere utilizzata, oppure seleziona *Illimitata* per indicare che non ci sono limiti.  Quindi seleziona *Applica*.
++
+image:screenshot_tiering_transfer_rate.png["Uno screenshot della finestra di dialogo Velocità di trasferimento massima per un cluster."]
+
+
+
+Questa impostazione non influisce sulla larghezza di banda assegnata ad altri cluster che stanno suddividendo i dati in livelli.
+
+
+
+== Scarica un report di tiering per i tuoi volumi
+
+Scarica un report della pagina Tier Volumi per poter esaminare lo stato di suddivisione in livelli di tutti i volumi nei cluster che stai gestendo.  Basta selezionare ilimage:button_download.png["Scaricamento"] pulsante.  Cloud Tiering genera un file .CSV che puoi esaminare e inviare ad altri gruppi in base alle tue esigenze.  Il file .CSV include fino a 10.000 righe di dati.
+
+image:screenshot_tiering_report_download.png["Uno screenshot che mostra come generare un file CSV che elenca lo stato di suddivisione in livelli di tutti i volumi."]
+
+
+
+== Migrare i dati dal livello cloud al livello delle prestazioni
+
+I dati a livelli a cui si accede dal cloud possono essere "riscaldati" e spostati nuovamente al livello delle prestazioni.  Tuttavia, se si desidera promuovere in modo proattivo i dati dal livello cloud al livello delle prestazioni, è possibile farlo nella finestra di dialogo _Criterio di suddivisione in livelli_.  Questa funzionalità è disponibile quando si utilizza ONTAP 9.8 e versioni successive.
+
+Puoi farlo se vuoi smettere di usare la suddivisione in livelli su un volume o se decidi di mantenere tutti i dati utente sul livello delle prestazioni, ma di conservare le copie Snapshot sul livello cloud.
+
+Ci sono due opzioni:
+
+[cols="22,45,35"]
+|===
+| Opzione | Descrizione | Effetto sulla politica di suddivisione in livelli 
+
+
+| Ripristina tutti i dati | Recupera tutti i dati del volume e le copie Snapshot suddivise in livelli nel cloud e le promuove al livello delle prestazioni. | La politica di suddivisione in livelli è stata modificata in "Nessuna politica". 
+
+
+| Ripristina il file system attivo | Recupera solo i dati attivi del file system suddivisi in livelli nel cloud e li promuove al livello delle prestazioni (le copie snapshot rimangono nel cloud). | La politica di suddivisione in livelli è stata modificata in "Snapshot a freddo". 
+|===
+
+NOTE: Il tuo provider cloud potrebbe addebitarti un costo in base alla quantità di dati trasferiti dal cloud.
+
+.Passi
+Assicurarsi che il livello di prestazioni disponga di spazio sufficiente per i dati trasferiti dal cloud.
+
+. Dal menu di navigazione a sinistra, seleziona *Mobilità > Cloud Tiering*.
+. Dalla pagina *Cluster*, seleziona *Volumi a livelli* per il cluster.
+. Dalla pagina *Cluster*, seleziona *Volumi a livelli* per il cluster.
+. Fare clic suimage:screenshot_edit_icon.gif["icona di modifica che appare alla fine di ogni riga nella tabella per i volumi di suddivisione in livelli"] icona per il volume, scegli l'opzione di recupero che desideri utilizzare e seleziona *Applica*.
+. Fare clic suimage:screenshot_edit_icon.gif["icona di modifica che appare alla fine di ogni riga nella tabella per i volumi di suddivisione in livelli"] icona per il volume, scegli l'opzione di recupero che desideri utilizzare e seleziona *Applica*.
++
+image:screenshot_tiering_policy_settings_with_retrieve.png["Uno screenshot che mostra le impostazioni configurabili dei criteri di suddivisione in livelli."]
+
+
+
+.Risultato
+La politica di suddivisione in livelli viene modificata e i dati suddivisi in livelli iniziano a essere migrati nuovamente al livello delle prestazioni.  A seconda della quantità di dati presenti nel cloud, il processo di trasferimento potrebbe richiedere del tempo.
+
+
+
+== Gestire le impostazioni di tiering sugli aggregati
+
+Ogni aggregato nei sistemi ONTAP locali dispone di due impostazioni che è possibile modificare: la soglia di riempimento dei livelli e l'abilitazione o meno della segnalazione dei dati inattivi.  Ogni aggregato nei sistemi ONTAP locali dispone di due impostazioni che è possibile modificare: la soglia di riempimento dei livelli e l'abilitazione o meno della segnalazione dei dati inattivi.
+
+Soglia di pienezza a livelli:: Impostando la soglia su un numero inferiore si riduce la quantità di dati che devono essere archiviati nel livello di prestazioni prima che venga eseguita la suddivisione in livelli.  Ciò potrebbe essere utile per aggregati di grandi dimensioni che contengono pochi dati attivi.
++
+--
+Impostando la soglia su un numero più alto, aumenta la quantità di dati che devono essere archiviati nel livello di prestazioni prima che venga eseguita la suddivisione in livelli.  Ciò potrebbe essere utile per le soluzioni progettate per suddividere in livelli solo quando gli aggregati sono prossimi alla capacità massima.
+
+--
+Segnalazione di dati inattivi:: La segnalazione dei dati inattivi (IDR) utilizza un periodo di raffreddamento di 31 giorni per determinare quali dati sono considerati inattivi.  La quantità di dati inattivi suddivisi in livelli dipende dalle policy di suddivisione in livelli impostate sui volumi.  Questa quantità potrebbe essere diversa dalla quantità di dati freddi rilevati da IDR utilizzando un periodo di raffreddamento di 31 giorni.
++
+--
+
+TIP: È meglio mantenere abilitato IDR perché aiuta a identificare i dati inattivi e le opportunità di risparmio.  IDR deve rimanere abilitato se la suddivisione in livelli dei dati è abilitata su un aggregato.
+
+--
+
+
+.Passi
+. Dalla pagina *Cluster*, seleziona *Configurazione avanzata* per il cluster selezionato.
+. Dalla pagina *Cluster*, seleziona *Configurazione avanzata* per il cluster selezionato.
++
+image:screenshot_tiering_advanced_setup_button.png["Uno screenshot che mostra il pulsante Configurazione avanzata per un cluster."]
+
+. Dalla pagina Configurazione avanzata, seleziona l'icona del menu per l'aggregato e seleziona *Modifica aggregato*.
+. Dalla pagina Configurazione avanzata, seleziona l'icona del menu per l'aggregato e seleziona *Modifica aggregato*.
++
+image:screenshot_tiering_modify_aggr.png["Uno screenshot che mostra l'opzione Modifica aggregato per un aggregato."]
+
+. Nella finestra di dialogo visualizzata, modifica la soglia di riempimento e scegli se abilitare o disabilitare la segnalazione dei dati inattivi.
++
+image:screenshot_tiering_modify_aggregate.png["Uno screenshot che mostra un cursore per modificare la soglia di riempimento dei livelli e un pulsante per abilitare o disabilitare la segnalazione dei dati inattivi."]
+
+. Fare clic su *Applica*.
+
+
+
+
+== Correggere la salute operativa
+
+In caso di errori, Cloud Tiering visualizza lo stato di integrità operativa "Non riuscito" nella Cluster Dashboard.  Lo stato di integrità riflette lo stato del sistema ONTAP e della console NetApp .
+
+.Passi
+. Identificare tutti i cluster il cui stato operativo è "Non riuscito".
+. Passando il mouse sull'icona informativa "i" è possibile visualizzare il motivo dell'errore.
+. Correggi il problema:
++
+.. Verificare che il cluster ONTAP sia operativo e che disponga di una connessione in entrata e in uscita con il provider di archiviazione oggetti.
+.. Verificare che la Console disponga di connessioni in uscita al servizio Cloud Tiering, all'archivio oggetti e ai cluster ONTAP che rileva.
+
+
+
+
+
+
+== Scopri cluster aggiuntivi da Cloud Tiering
+
+È possibile aggiungere i cluster ONTAP locali non scoperti alla Console dalla pagina Tiering _Cluster_ in modo da poter abilitare il tiering per il cluster.
+
+Tieni presente che nella pagina della dashboard Tiering _On-Prem_ vengono visualizzati anche dei pulsanti che consentono di scoprire cluster aggiuntivi.
+
+.Passi
+. Da Cloud Tiering, seleziona la scheda *Cluster*.
+. Per visualizzare eventuali cluster non scoperti, seleziona *Mostra cluster non scoperti*.
+. Per visualizzare eventuali cluster non scoperti, seleziona *Mostra cluster non scoperti*.
++
+image:screenshot_tiering_show_undiscovered_cluster.png["Uno screenshot che mostra il pulsante Mostra cluster non scoperti nella dashboard di suddivisione in livelli."]
+
++
+Se le credenziali NSS sono salvate nella Console, i cluster presenti nel tuo account vengono visualizzati nell'elenco.
+
++
+Se le credenziali NSS non vengono salvate, ti verrà chiesto di aggiungerle prima di poter visualizzare i cluster non rilevati.
+
++
+image:screenshot_tiering_discover_cluster.png["Uno screenshot che mostra come individuare un cluster esistente da aggiungere alla Console e alla Dashboard di suddivisione in livelli."]
+
+. Fare clic su *Scopri cluster* per il cluster che si desidera gestire tramite la Console e implementare la suddivisione in livelli dei dati.
+. Nella pagina _Dettagli cluster_, immettere la password per l'account utente amministratore e selezionare *Scopri*.
+. Nella pagina _Dettagli cluster_, immettere la password per l'account utente amministratore e selezionare *Scopri*.
++
+Tieni presente che l'indirizzo IP di gestione del cluster viene popolato in base alle informazioni del tuo account NSS.
+
+. Nella pagina _Dettagli e credenziali_ il nome del cluster viene aggiunto come Nome del sistema, quindi seleziona *Vai*.
+
+
+.Risultato
+La Console rileva il cluster e lo aggiunge alla pagina Sistemi utilizzando il nome del cluster come nome del sistema.
+
+È possibile abilitare il servizio Tiering o altri servizi per questo cluster nel pannello di destra.
+
+
+
+== Cerca un cluster in tutti gli agenti della console
+
+Se si utilizzano più agenti per gestire tutto lo storage nel proprio ambiente, alcuni cluster su cui si desidera implementare la suddivisione in livelli potrebbero trovarsi in un altro agente.  Se non sei sicuro di quale agente gestisce un determinato cluster, puoi effettuare una ricerca tra tutti gli agenti utilizzando Cloud Tiering.
+
+.Passi
+. Nella barra dei menu Cloud Tiering, seleziona il menu Azione e seleziona *Cerca cluster in tutti gli agenti*.
++
+image:screenshot_tiering_search for_cluster.png["Uno screenshot che mostra come cercare un cluster che potrebbe trovarsi in uno qualsiasi dei tuoi agenti."]
+
+. Nella finestra di dialogo Cerca visualizzata, immettere il nome del cluster e selezionare *Cerca*.
++
+Cloud Tiering visualizza il nome dell'agente se riesce a trovare il cluster.
+
+. https://docs.netapp.com/us-en/bluexp-setup-admin/task-manage-multiple-connectors.html#switch-between-connectors["Passa all'agente e configura la suddivisione in livelli per il cluster"^] .
+

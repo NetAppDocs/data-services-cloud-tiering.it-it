@@ -1,0 +1,222 @@
+---
+sidebar: sidebar 
+permalink: task-tiering-onprem-s3-compat.html 
+keywords: data tiering, fabricpool, cloud tiering, tiering cold data, tiering inactive data, tiering aff, tiering fas, tiering ontap, tiering volumes, tier data, tier cold data, tier fas, tier aff, tier ontap, s3, tier to s3, minio 
+summary: 'Libera spazio sui tuoi cluster ONTAP locali suddividendo i dati inattivi in ​​qualsiasi servizio di Object Storage che utilizzi il protocollo Simple Storage Service (S3).' 
+---
+= Suddivisione dei dati in livelli dai cluster ONTAP locali allo storage di oggetti S3 in NetApp Cloud Tiering
+:hardbreaks:
+:allow-uri-read: 
+:nofooter: 
+:icons: font
+:linkattrs: 
+:imagesdir: ./media/
+
+
+[role="lead"]
+Libera spazio sui tuoi cluster ONTAP locali suddividendo i dati inattivi in ​​NetApp Cloud Tiering in qualsiasi servizio di archiviazione di oggetti che utilizzi il protocollo Simple Storage Service (S3).
+
+Al momento, l'archiviazione di oggetti MinIO è stata qualificata.
+
+[CAUTION]
+====
+I clienti che desiderano utilizzare archivi di oggetti non ufficialmente supportati come livello cloud possono farlo seguendo queste istruzioni.  I clienti devono testare e confermare che l'archivio oggetti soddisfi i loro requisiti.
+
+NetApp non fornisce supporto né è responsabile per eventuali problemi derivanti da Object Store Service di terze parti, in particolare laddove non abbia accordi di supporto concordati con la terza parte da cui è stato originato il prodotto.  Si riconosce e si concorda che NetApp non sarà responsabile per eventuali danni associati né sarà altrimenti tenuta a fornire supporto su tale prodotto di terze parti.
+
+====
+
+
+== Avvio rapido
+
+Inizia subito seguendo questi passaggi oppure scorri verso il basso fino alle sezioni rimanenti per i dettagli completi.
+
+.image:https://raw.githubusercontent.com/NetAppDocs/common/main/media/number-1.png["Uno"]Prepararsi a suddividere i dati in livelli per l'archiviazione di oggetti compatibile con S3
+[role="quick-margin-para"]
+Ti occorre quanto segue:
+
+[role="quick-margin-list"]
+* Un cluster ONTAP locale di origine che esegue ONTAP 9.8 o versione successiva aggiunto alla console NetApp e una connessione tramite una porta specificata dall'utente allo storage di oggetti di destinazione compatibile con S3. https://docs.netapp.com/us-en/bluexp-ontap-onprem/task-discovering-ontap.html["Scopri come scoprire un cluster"^] .
+* FQDN, chiave di accesso e chiave segreta per il server di archiviazione degli oggetti in modo che il cluster ONTAP possa accedere al bucket.
+* Un agente Console installato presso la tua sede.
+* Rete per l'agente che consente una connessione HTTPS in uscita al cluster ONTAP di origine, all'archiviazione di oggetti compatibile con S3 e al servizio Cloud Tiering.
+
+
+.image:https://raw.githubusercontent.com/NetAppDocs/common/main/media/number-2.png["Due"]Imposta livelli
+[role="quick-margin-para"]
+Nella Console, seleziona un sistema locale, seleziona *Abilita* per il servizio Tiering e segui le istruzioni per suddividere i dati in livelli per l'archiviazione di oggetti compatibile con S3.
+
+.image:https://raw.githubusercontent.com/NetAppDocs/common/main/media/number-3.png["Tre"]Impostare la licenza
+[role="quick-margin-para"]
+Paga Cloud Tiering tramite un abbonamento pay-as-you-go dal tuo provider cloud, una licenza Bring-Your-Own-License di Cloud Tiering o una combinazione di entrambi:
+
+[role="quick-margin-list"]
+* Per sottoscrivere l'offerta PAYGO dal https://aws.amazon.com/marketplace/pp/prodview-oorxakq6lq7m4?sr=0-8&ref_=beagle&applicationId=AWSMPContessa["Mercato AWS"^] , https://azuremarketplace.microsoft.com/en-us/marketplace/apps/netapp.cloud-manager?tab=Overview["Azure Marketplace"^] , O https://console.cloud.google.com/marketplace/details/netapp-cloudmanager/cloud-manager?supportedpurview=project&rif_reserved["Mercato GCP"^] , seleziona *Iscriviti* e segui le istruzioni.
+* Per pagare utilizzando una licenza Cloud Tiering BYOL, mailto:ng-cloud-tiering@netapp.com?subject=Licensing[contattaci se devi acquistarne una], quindilink:https://docs.netapp.com/us-en/bluexp-digital-wallet/task-manage-data-services-licenses.html["aggiungilo alla console NetApp"^] . .
+
+
+
+
+== Requisiti
+
+Verifica il supporto per il tuo cluster ONTAP , configura la rete e prepara l'archiviazione degli oggetti.
+
+L'immagine seguente mostra ciascun componente e le connessioni che è necessario predisporre tra di essi:
+
+image:diagram_cloud_tiering_s3_compat.png["Un'immagine dell'architettura che mostra il servizio Cloud Tiering con una connessione all'agente in sede, l'agente con una connessione al cluster ONTAP e una connessione tra il cluster ONTAP e l'archiviazione degli oggetti.  I dati attivi risiedono nel cluster ONTAP , mentre i dati inattivi risiedono nell'archiviazione degli oggetti."]
+
+
+NOTE: La comunicazione tra l'agente e il server di archiviazione oggetti compatibile con S3 è riservata esclusivamente alla configurazione dell'archiviazione oggetti.
+
+
+
+=== Prepara i tuoi cluster ONTAP
+
+I cluster ONTAP di origine devono soddisfare i seguenti requisiti quando si suddividono i dati in livelli per l'archiviazione di oggetti compatibile con S3.
+
+Piattaforme ONTAP supportate:: È possibile suddividere i dati dai sistemi AFF o dai sistemi FAS con aggregati interamente SSD o interamente HDD.
+Versione ONTAP supportata:: ONTAP 9.8 o successivo
+Requisiti di rete del cluster::
++
+--
+* Il cluster ONTAP avvia una connessione HTTPS tramite una porta specificata dall'utente verso un archivio di oggetti compatibile con S3 (la porta è configurabile durante la configurazione dei livelli).
++
+Il sistema ONTAP di origine legge e scrive dati da e verso l'archiviazione degli oggetti.  L'archiviazione degli oggetti non si avvia mai, risponde e basta.
+
+* È richiesta una connessione in entrata dall'agente, che deve risiedere presso la tua sede.
++
+Non è richiesta una connessione tra il cluster e il servizio Cloud Tiering.
+
+* È necessario un LIF intercluster su ciascun nodo ONTAP che ospita i volumi che si desidera suddividere in livelli.  Il LIF deve essere associato allo _IPspace_ che ONTAP deve utilizzare per connettersi all'archiviazione degli oggetti.
++
+Quando si imposta il tiering dei dati, Cloud Tiering richiede lo spazio IP da utilizzare.  Dovresti scegliere lo spazio IP a cui è associato ciascun LIF.  Potrebbe trattarsi dello spazio IP "predefinito" o di uno spazio IP personalizzato creato da te.  Scopri di più su https://docs.netapp.com/us-en/ontap/networking/create_a_lif.html["LIF"^] E https://docs.netapp.com/us-en/ontap/networking/standard_properties_of_ipspaces.html["Spazi IP"^] .
+
+
+
+--
+Volumi e aggregati supportati:: Il numero totale di volumi che Cloud Tiering può suddividere in livelli potrebbe essere inferiore al numero di volumi presenti nel sistema ONTAP .  Questo perché i volumi non possono essere suddivisi in livelli da alcuni aggregati.  Fare riferimento alla documentazione ONTAP per https://docs.netapp.com/us-en/ontap/fabricpool/requirements-concept.html#functionality-or-features-not-supported-by-fabricpool["funzionalità o caratteristiche non supportate da FabricPool"^] .
+
+
+
+TIP: Cloud Tiering supporta sia i volumi FlexVol che FlexGroup .
+
+
+
+=== Scopri un cluster ONTAP
+
+Prima di poter iniziare a suddividere in livelli i dati inattivi, è necessario aggiungere il sistema ONTAP locale alla Console.
+
+https://docs.netapp.com/us-en/bluexp-ontap-onprem/task-discovering-ontap.html["Scopri come scoprire un cluster"^] .
+
+
+
+=== Preparare un archivio di oggetti compatibile con S3
+
+L'archiviazione di oggetti compatibile con S3 deve soddisfare i seguenti requisiti.
+
+Credenziali S3:: Quando si configura il tiering per l'archiviazione di oggetti compatibile con S3, viene richiesto di creare un bucket S3 o di selezionarne uno esistente.  È necessario fornire a Cloud Tiering una chiave di accesso S3 e una chiave segreta.  Cloud Tiering utilizza le chiavi per accedere al tuo bucket.
++
+--
+Queste chiavi di accesso devono essere associate a un utente che dispone delle seguenti autorizzazioni:
+
+[source, json]
+----
+"s3:ListAllMyBuckets",
+"s3:ListBucket",
+"s3:GetObject",
+"s3:PutObject",
+"s3:DeleteObject",
+"s3:CreateBucket"
+----
+--
+
+
+
+
+=== Crea o cambia agenti
+
+Per suddividere i dati nel cloud è necessario un agente Console.  Quando si suddividono i dati in livelli per l'archiviazione di oggetti compatibile con S3, è necessario che un agente sia disponibile presso la sede dell'utente.  Sarà necessario installare un nuovo agente oppure assicurarsi che l'agente attualmente selezionato risieda in locale.
+
+* https://docs.netapp.com/us-en/bluexp-setup-admin/concept-connectors.html["Scopri di più sugli agenti"^]
+* https://docs.netapp.com/us-en/bluexp-setup-admin/task-install-connector-on-prem.html["Installa e configura un agente in sede"^]
+* https://docs.netapp.com/us-en/bluexp-setup-admin/task-manage-multiple-connectors.html#switch-between-connectors["Passa da un agente all'altro"^]
+
+
+
+
+=== Preparare la rete per l'agente della console
+
+Assicurarsi che l'agente disponga delle connessioni di rete richieste.
+
+.Passi
+. Assicurarsi che la rete in cui è installato l'agente consenta le seguenti connessioni:
++
+** Una connessione HTTPS sulla porta 443 al servizio Cloud Tiering(https://docs.netapp.com/us-en/bluexp-setup-admin/task-set-up-networking-on-prem.html#endpoints-contacted-for-day-to-day-operations["vedere l'elenco degli endpoint"^] )
+** Una connessione HTTPS sulla porta 443 verso un archivio di oggetti compatibile con S3
+** Una connessione HTTPS sulla porta 443 al LIF di gestione del cluster ONTAP
+
+
+
+
+
+
+== Suddivisione in livelli dei dati inattivi dal primo cluster all'archiviazione di oggetti compatibile con S3
+
+Dopo aver preparato l'ambiente, inizia a suddividere in livelli i dati inattivi dal tuo primo cluster.
+
+.Cosa ti servirà
+* https://docs.netapp.com/us-en/bluexp-ontap-onprem/task-discovering-ontap.html["Un sistema on-premise aggiunto alla console NetApp"^] .
+* Il nome di dominio completo (FQDN) del server di archiviazione oggetti compatibile con S3 e la porta che verrà utilizzata per le comunicazioni HTTPS.
+* Una chiave di accesso e una chiave segreta che dispongono delle autorizzazioni S3 richieste.
+
+
+.Passi
+. Selezionare il sistema ONTAP locale.
+. Fare clic su *Abilita* per il servizio Cloud Tiering dal pannello di destra.
++
+image:screenshot_setup_tiering_onprem.png["Uno screenshot che mostra l'opzione Tiering che appare sul lato destro dello schermo dopo aver selezionato un sistema ONTAP locale."]
+
+. *Definisci nome archivio oggetti*: inserisci un nome per questo archivio oggetti.  Deve essere univoco rispetto a qualsiasi altro archivio di oggetti che potresti utilizzare con gli aggregati su questo cluster.
+. *Seleziona fornitore*: seleziona *Compatibile con S3* e seleziona *Continua*.
+. *Seleziona fornitore*: seleziona *Compatibile con S3* e seleziona *Continua*.
+. Completare i passaggi nelle pagine *Crea archiviazione oggetti*:
++
+.. *Server*: immettere il nome di dominio completo (FQDN) del server di archiviazione oggetti compatibile con S3, la porta che ONTAP deve utilizzare per la comunicazione HTTPS con il server, nonché la chiave di accesso e la chiave segreta per un account che dispone delle autorizzazioni S3 richieste.
+.. *Bucket*: aggiungi un nuovo bucket o selezionane uno esistente e seleziona *Continua*.
+.. *Bucket*: aggiungi un nuovo bucket o selezionane uno esistente e seleziona *Continua*.
+.. *Rete cluster*: selezionare lo spazio IP che ONTAP deve utilizzare per connettersi all'archiviazione degli oggetti e selezionare *Continua*.
+.. *Rete cluster*: selezionare lo spazio IP che ONTAP deve utilizzare per connettersi all'archiviazione degli oggetti e selezionare *Continua*.
++
+Selezionando lo spazio IP corretto si garantisce che Cloud Tiering possa impostare una connessione da ONTAP al tuo storage di oggetti compatibile con S3.
+
++
+È anche possibile impostare la larghezza di banda di rete disponibile per caricare dati inattivi nell'archiviazione degli oggetti definendo la "Velocità di trasferimento massima".  Selezionare il pulsante di opzione *Limitato* e immettere la larghezza di banda massima utilizzabile, oppure selezionare *Illimitato* per indicare che non vi è alcun limite.
+
+
+
+. Nella pagina _Successo_ seleziona *Continua* per impostare subito i tuoi volumi.
+. Nella pagina _Volumi a livelli_, seleziona i volumi per i quali desideri configurare la suddivisione in livelli e seleziona *Continua*:
++
+** Per selezionare tutti i volumi, seleziona la casella nella riga del titolo (image:button_backup_all_volumes.png[""] ) e seleziona *Configura volumi*.
+** Per selezionare più volumi, seleziona la casella per ogni volume (image:button_backup_1_volume.png[""] ) e seleziona *Configura volumi*.
+** Per selezionare un singolo volume, selezionare la riga (oimage:screenshot_edit_icon.gif["modifica icona matita"] icona) per il volume.
++
+image:screenshot_tiering_initial_volumes.png["Uno screenshot che mostra come selezionare un singolo volume, più volumi o tutti i volumi e il pulsante Modifica volumi selezionati."]
+
+
+
+. Nella finestra di dialogo _Criterio di suddivisione in livelli_, seleziona un criterio di suddivisione in livelli, modifica facoltativamente i giorni di raffreddamento per i volumi selezionati e seleziona *Applica*.
++
+link:concept-cloud-tiering.html#volume-tiering-policies["Scopri di più sulle politiche di suddivisione in livelli di volume e sui giorni di raffreddamento"] .
+
++
+image:screenshot_tiering_initial_policy_settings.png["Uno screenshot che mostra le impostazioni configurabili dei criteri di suddivisione in livelli."]
+
+
+
+.Cosa succederà ora?
+link:task-licensing-cloud-tiering.html["Assicurati di abbonarti al servizio Cloud Tiering"] .
+
+È possibile esaminare le informazioni sui dati attivi e inattivi del cluster. link:task-managing-tiering.html["Scopri di più sulla gestione delle impostazioni di suddivisione in livelli"] .
+
+È anche possibile creare un archivio di oggetti aggiuntivo nei casi in cui si desideri suddividere i dati da determinati aggregati su un cluster in archivi di oggetti diversi.  Oppure se si prevede di utilizzare FabricPool Mirroring, in cui i dati a livelli vengono replicati in un archivio oggetti aggiuntivo. link:task-managing-object-storage.html["Scopri di più sulla gestione degli archivi di oggetti"] .

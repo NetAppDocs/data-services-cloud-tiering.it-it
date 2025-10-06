@@ -1,0 +1,244 @@
+---
+sidebar: sidebar 
+permalink: concept-cloud-tiering.html 
+keywords: cloud tiering, overview, conceptual, value, features, cost, charging, tiering policies, cooling period, fabricpool, netapp console, console, bluexp 
+summary: Il servizio Cloud Tiering di NetApp estende il tuo data center al cloud suddividendo automaticamente i dati inattivi dai cluster ONTAP locali allo storage di oggetti.  In questo modo si libera spazio prezioso sul cluster per altri carichi di lavoro, senza apportare modifiche al livello applicativo.  Cloud Tiering può ridurre i costi del tuo data center e ti consente di passare da un modello CAPEX a un modello OPEX. 
+---
+= Scopri di più su NetApp Cloud Tiering
+:hardbreaks:
+:allow-uri-read: 
+:nofooter: 
+:icons: font
+:linkattrs: 
+:imagesdir: ./media/
+
+
+[role="lead"]
+NetApp Cloud Tiering estende il tuo data center al cloud suddividendo automaticamente i dati inattivi dai cluster ONTAP locali allo storage di oggetti.  In questo modo si libera spazio prezioso sul cluster per altri carichi di lavoro, senza apportare modifiche al livello applicativo.  Cloud Tiering può ridurre i costi del tuo data center e ti consente di passare da un modello CAPEX a un modello OPEX.
+
+Cloud Tiering sfrutta le capacità di _FabricPool_.  FabricPool è una tecnologia NetApp Data Fabric che consente la suddivisione automatica dei dati in livelli di storage di oggetti a basso costo.  I dati attivi (caldi) rimangono sul livello locale (aggregati ONTAP on-premise), mentre i dati inattivi (freddi) vengono spostati sul livello cloud, il tutto preservando l'efficienza dei dati ONTAP .
+
+Originariamente supportato sui sistemi AFF, FAS e ONTAP Select con aggregati interamente SSD, a partire da ONTAP 9.8 è possibile suddividere i dati in livelli da aggregati costituiti da HDD oltre che da SSD ad alte prestazioni. Vedere https://docs.netapp.com/us-en/ontap/fabricpool/requirements-concept.html["le considerazioni e i requisiti per l'utilizzo FabricPool"^] per i dettagli.
+
+È possibile configurare la suddivisione in livelli per cluster a nodo singolo, cluster configurati HA, cluster in configurazioni Tiering Mirror e configurazioni MetroCluster utilizzando FabricPool Mirror.  Le licenze Cloud Tiering sono condivise tra tutti i cluster.
+
+https://bluexp.netapp.com/cloud-tiering-service-tco["Utilizza il calcolatore TCO di Cloud Tiering per vedere quanti soldi puoi risparmiare"^] .
+
+
+
+== Console NetApp
+
+È possibile accedere a NetApp Cloud Tiering tramite la console NetApp .
+
+NetApp Console offre una gestione centralizzata dei servizi di archiviazione e dati NetApp in ambienti on-premise e cloud su scala aziendale. La console è necessaria per accedere e utilizzare i servizi dati NetApp . In quanto interfaccia di gestione, consente di gestire numerose risorse di archiviazione da un'unica interfaccia. Gli amministratori della console possono controllare l'accesso allo storage e ai servizi per tutti i sistemi all'interno dell'azienda.
+
+Per iniziare a utilizzare NetApp Console non è necessaria una licenza o un abbonamento e i costi saranno addebitati solo quando sarà necessario distribuire gli agenti della console nel cloud per garantire la connettività ai sistemi di storage o ai servizi dati NetApp . Tuttavia, alcuni servizi dati NetApp accessibili dalla Console sono concessi in licenza o basati su abbonamento.
+
+Scopri di più su https://docs.netapp.com/us-en/bluexp-setup-admin/concept-overview.html["Console NetApp"] .
+
+
+
+== Caratteristiche
+
+Cloud Tiering offre automazione, monitoraggio, report e un'interfaccia di gestione comune:
+
+* L'automazione semplifica la configurazione e la gestione della suddivisione in livelli dei dati dai cluster ONTAP locali al cloud.
+* È possibile scegliere la classe di archiviazione/livello di accesso del provider cloud predefinito oppure utilizzare la gestione del ciclo di vita per assegnare un livello più conveniente ai dati di livello più vecchio.
+* È possibile creare connessioni ad archivi di oggetti aggiuntivi che possono essere utilizzati per altri aggregati nel cluster.
+* Utilizzando l'interfaccia utente, è possibile trascinare gli archivi di oggetti in un aggregato per la suddivisione in livelli e per il mirroring FabricPool .
+* Un unico pannello di controllo elimina la necessità di gestire FabricPool in modo indipendente su più cluster.
+* I report mostrano la quantità di dati attivi e inattivi su ciascun cluster.
+* Uno stato di salute a livelli aiuta a identificare e correggere i problemi non appena si verificano.
+* Se disponi di sistemi Cloud Volumes ONTAP , li troverai nella pagina Cluster, così da avere una visione completa della suddivisione in livelli dei dati nella tua infrastruttura cloud ibrida.
+
+
+Per maggiori dettagli sul valore offerto da Cloud Tiering, https://bluexp.netapp.com/cloud-tiering["consulta la pagina Cloud Tiering sul sito Web NetApp Console"^] .
+
+
+TIP: I sistemi Cloud Volumes ONTAP sono di sola lettura da Cloud Tiering. https://docs.netapp.com/us-en/bluexp-cloud-volumes-ontap/task-tiering.html["È possibile impostare la suddivisione in livelli per i sistemi Cloud Volumes ONTAP nella console NetApp ."^] .
+
+
+
+== Provider di archiviazione di oggetti supportati
+
+È possibile suddividere i dati inattivi da un sistema ONTAP locale ai seguenti provider di archiviazione di oggetti:
+
+* Amazon S3
+* Blob di Microsoft Azure
+* Google Cloud Storage
+* NetApp StorageGRID
+* Archiviazione di oggetti compatibile con S3 (ad esempio, MinIO)
+
+
+Le licenze Cloud Tiering possono anche essere condivise con i cluster che suddividono i dati in livelli su IBM Cloud Object Storage.  La configurazione FabricPool deve essere impostata tramite System Manager o ONTAP CLI, malink:task-licensing-cloud-tiering.html#apply-bluexp-tiering-licenses-to-clusters-in-special-configurations["la concessione delle licenze per questo tipo di configurazione viene completata tramite Cloud Tiering."]
+
+
+NOTE: È possibile suddividere i dati dai volumi NAS al cloud pubblico o ai cloud privati, come StorageGRID.  Quando si suddividono in livelli i dati a cui si accede tramite protocolli SAN, NetApp consiglia di utilizzare cloud privati ​​per motivi di connettività.
+
+
+
+=== Livelli di archiviazione degli oggetti
+
+I cluster ONTAP possono suddividere i dati inattivi in ​​un singolo archivio oggetti o in più archivi oggetti.  Quando si imposta la suddivisione in livelli dei dati, è possibile scegliere di aggiungere un nuovo bucket/contenitore oppure di selezionarne uno esistente, insieme a una classe di archiviazione o a un livello di accesso.
+
+* link:reference-aws-support.html["Scopri di più sulle classi di storage AWS S3 supportate"]
+* link:reference-azure-support.html["Scopri di più sui livelli di accesso supportati ad Azure Blob"]
+* link:reference-google-support.html["Scopri di più sulle classi di archiviazione Google Cloud supportate"]
+
+
+Cloud Tiering utilizza la classe di archiviazione/livello di accesso predefinito del provider cloud per i dati inattivi.  Tuttavia, è possibile applicare una regola del ciclo di vita in modo che i dati passino automaticamente dalla classe di archiviazione predefinita a un'altra classe di archiviazione dopo un certo numero di giorni.  Ciò può aiutare a contenere i costi spostando i dati molto freddi su un archivio meno costoso.
+
+
+NOTE: Non è possibile selezionare regole del ciclo di vita per i dati suddivisi in livelli su StorageGRID o su storage compatibile con S3.
+
+
+
+== Prezzi e licenze
+
+Puoi pagare Cloud Tiering tramite un abbonamento pay-as-you-go, un abbonamento annuale, una licenza di tiering NetApp Bring-your-own o una combinazione di queste.  Se non si dispone di una licenza, è disponibile una prova gratuita di 30 giorni per il primo cluster.
+
+Non ci sono costi per il livellamento dei dati su StorageGRID.  Non è richiesta né una licenza BYOL né la registrazione PAYGO.
+
+https://bluexp.netapp.com/pricing#tiering["Visualizza i dettagli dei prezzi"^] .
+
+Poiché Cloud Tiering preserva l'efficienza di archiviazione del volume di origine, si pagano al provider cloud i costi di archiviazione degli oggetti per i dati suddivisi in livelli dopo l'efficienza ONTAP (per la quantità minore di dati dopo l'applicazione della deduplicazione e della compressione).
+
+
+
+=== Prova gratuita di 30 giorni
+
+Se non disponi di una licenza Cloud Tiering, una prova gratuita di 30 giorni del tiering inizia quando imposti il tiering sul tuo primo cluster.  Al termine del periodo di prova gratuito di 30 giorni, sarà necessario pagare per il livello tramite un abbonamento pay-as-you-go, un abbonamento annuale, una licenza BYOL o una combinazione di questi.
+
+Se il periodo di prova gratuito termina e non hai sottoscritto un abbonamento o aggiunto una licenza, ONTAP non suddividerà più i dati inattivi in ​​livelli per l'archiviazione degli oggetti.  Tutti i dati precedentemente suddivisi in livelli rimangono accessibili, il che significa che è possibile recuperarli e utilizzarli.  Una volta recuperati, questi dati vengono spostati nuovamente dal cloud al livello di prestazioni.
+
+
+
+=== Abbonamento a consumo
+
+Cloud Tiering offre licenze basate sul consumo secondo un modello di pagamento a consumo.  Dopo aver sottoscritto l'abbonamento tramite il marketplace del tuo provider cloud, pagherai per GB i dati suddivisi in livelli, senza alcun pagamento anticipato.  La fatturazione avviene tramite la bolletta mensile del tuo provider cloud.
+
+Dovresti abbonarti anche se hai una prova gratuita o se porti la tua licenza (BYOL):
+
+* L'abbonamento garantisce che non vi saranno interruzioni del servizio al termine del periodo di prova gratuito.
++
+Al termine del periodo di prova, ti verrà addebitato un importo orario in base alla quantità di dati che hai suddiviso in livelli.
+
+* Se suddividi in livelli più dati di quelli consentiti dalla tua licenza BYOL, la suddivisione in livelli dei dati continua tramite l'abbonamento a consumo.
++
+Ad esempio, se si dispone di una licenza da 10 TB, tutta la capacità oltre i 10 TB verrà addebitata tramite l'abbonamento a consumo.
+
+
+
+Non ti verrà addebitato alcun costo sul tuo abbonamento a consumo durante il periodo di prova gratuito o se non hai superato la tua licenza Cloud Tiering BYOL.
+
+link:task-licensing-cloud-tiering.html#use-a-bluexp-tiering-paygo-subscription["Scopri come impostare un abbonamento a consumo"] .
+
+
+
+=== Contratto annuale
+
+Cloud Tiering offre un contratto annuale per il livellamento dei dati inattivi su Amazon S3 o Azure.  È disponibile con durata di 1, 2 o 3 anni.
+
+Al momento, i contratti annuali non sono supportati quando si passa a Google Cloud.
+
+
+
+=== Porta la tua patente
+
+Porta la tua licenza acquistando una licenza *Cloud Tiering* da NetApp (in precedenza nota come licenza "Cloud Tiering").  È possibile acquistare licenze della durata di 1, 2 o 3 anni e specificare qualsiasi quantità di capacità di suddivisione in livelli (a partire da un minimo di 10 TiB).  La licenza BYOL Cloud Tiering è una licenza _floating_ che puoi utilizzare su più cluster ONTAP locali.  La capacità totale di suddivisione in livelli definita nella licenza Cloud Tiering può essere utilizzata da tutti i cluster locali.
+
+Dopo aver acquistato una licenza Cloud Tiering, dovrai aggiungerla alla NetApp Console. link:task-licensing-cloud-tiering.html#use-a-bluexp-tiering-byol-license["Scopri come utilizzare una licenza BYOL Cloud Tiering"] .
+
+Come accennato in precedenza, ti consigliamo di impostare un abbonamento a consumo, anche se hai acquistato una licenza BYOL.
+
+
+NOTE: A partire da agosto 2021, la vecchia licenza * FabricPool* è stata sostituita dalla licenza *Cloud Tiering*. link:task-licensing-cloud-tiering.html#bluexp-tiering-byol-licensing-starting-in-2021["Scopri di più su come la licenza Cloud Tiering è diversa dalla licenza FabricPool"] .
+
+
+
+== Come funziona il Cloud Tiering
+
+Cloud Tiering è un servizio gestito da NetApp che utilizza la tecnologia FabricPool per suddividere automaticamente in livelli i dati inattivi (cold) dai cluster ONTAP locali allo storage di oggetti nel cloud pubblico o privato.  Le connessioni a ONTAP avvengono da un agente Console.
+
+L'immagine seguente mostra la relazione tra ciascun componente:
+
+image:diagram_cloud_tiering.png["Un'immagine dell'architettura che mostra il servizio Cloud Tiering con una connessione all'agente Console nel tuo provider cloud, l'agente con una connessione al tuo cluster ONTAP e una connessione tra il cluster ONTAP e l'archiviazione oggetti nel tuo provider cloud.  I dati attivi risiedono nel cluster ONTAP , mentre i dati inattivi risiedono nell'archiviazione degli oggetti."]
+
+A livello generale, il Cloud Tiering funziona in questo modo:
+
+. Puoi scoprire il tuo cluster on-premise dalla console NetApp .
+. Per impostare la suddivisione in livelli, è necessario fornire dettagli sull'archiviazione degli oggetti, tra cui il bucket/contenitore, una classe di archiviazione o un livello di accesso e le regole del ciclo di vita per i dati suddivisi in livelli.
+. La console configura ONTAP per utilizzare il provider di archiviazione oggetti e rileva la quantità di dati attivi e inattivi sul cluster.
+. È possibile scegliere i volumi da suddividere in livelli e la politica di suddivisione in livelli da applicare a tali volumi.
+. ONTAP inizia a suddividere i dati inattivi nell'archivio oggetti non appena i dati raggiungono le soglie per essere considerati inattivi (vedere<<Criteri di suddivisione in livelli del volume>> ).
+. Se hai applicato una regola del ciclo di vita ai dati suddivisi in livelli (disponibile solo per alcuni provider), i dati suddivisi in livelli più vecchi vengono assegnati a un livello più conveniente dopo un certo numero di giorni.
+
+
+
+
+=== Criteri di suddivisione in livelli del volume
+
+Quando selezioni i volumi che vuoi suddividere in livelli, scegli una _politica di suddivisione in livelli dei volumi_ da applicare a ciascun volume.  Una politica di suddivisione in livelli determina quando e se i blocchi di dati utente di un volume vengono spostati nel cloud.
+
+È anche possibile regolare il *periodo di raffreddamento*.  Si tratta del numero di giorni per cui i dati utente in un volume devono rimanere inattivi prima di essere considerati "freddi" e spostati nell'archivio oggetti.  Per le policy di suddivisione in livelli che consentono di regolare il periodo di raffreddamento, i valori validi sono:
+
+* Da 2 a 183 giorni se si utilizza ONTAP 9.8 e versioni successive
+* Da 2 a 63 giorni per le versioni ONTAP precedenti
+
+
+La pratica migliore consigliata è da 2 a 63.
+
+Nessuna politica (Nessuna):: Mantiene i dati su un volume nel livello delle prestazioni, impedendone lo spostamento al livello cloud.
+Istantanee fredde (solo snapshot):: ONTAP suddivide i blocchi Snapshot a freddo nel volume che non sono condivisi con il file system attivo nell'archiviazione degli oggetti.  Se letti, i blocchi di dati freddi sul livello cloud diventano caldi e vengono spostati sul livello delle prestazioni.
++
+--
+I dati vengono suddivisi in livelli solo dopo che un aggregato ha raggiunto il 50% della capacità e quando i dati hanno raggiunto il periodo di raffreddamento.  Il numero predefinito di giorni di raffreddamento è 2, ma è possibile modificarlo.
+
+
+NOTE: I dati rielaborati vengono riscritti nel livello di prestazioni solo se c'è spazio.  Se la capacità del livello di prestazioni è occupata per oltre il 70%, l'accesso ai blocchi continua dal livello cloud.
+
+--
+Dati utente freddi e snapshot (Auto):: ONTAP suddivide tutti i blocchi freddi nel volume (esclusi i metadati) nell'archiviazione degli oggetti.  I dati freddi non includono solo le copie Snapshot, ma anche i dati utente freddi provenienti dal file system attivo.
++
+--
+* Se letti tramite letture casuali, i blocchi di dati freddi sul livello cloud diventano caldi e vengono spostati sul livello delle prestazioni.
+* Se letti tramite letture sequenziali, come quelle associate alle scansioni di indici e antivirus, i blocchi di dati freddi sul livello cloud rimangono freddi e non vengono scritti sul livello delle prestazioni.
++
+Questa policy è disponibile a partire da ONTAP 9.4.
+
++
+I dati vengono suddivisi in livelli solo dopo che un aggregato ha raggiunto il 50% della capacità e quando i dati hanno raggiunto il periodo di raffreddamento.  Il numero predefinito di giorni di raffreddamento è 31, ma è possibile modificarlo.
+
++
+
+NOTE: I dati rielaborati vengono riscritti nel livello di prestazioni solo se c'è spazio.  Se la capacità del livello di prestazioni è occupata per oltre il 70%, l'accesso ai blocchi continua dal livello cloud.
+
+
+
+--
+Tutti i dati utente (Tutti):: Tutti i dati (esclusi i metadati) vengono immediatamente contrassegnati come cold e trasferiti nell'archiviazione degli oggetti il prima possibile.  Non è necessario attendere 48 ore affinché i nuovi blocchi di un volume si raffreddino.  I blocchi presenti nel volume prima dell'impostazione del criterio All richiedono 48 ore per raffreddarsi.
++
+--
+Se letti, i blocchi di dati freddi sul livello cloud restano freddi e non vengono riscritti sul livello delle prestazioni.  Questa policy è disponibile a partire da ONTAP 9.6.
+
+Prima di scegliere questa politica di suddivisione in livelli, tieni presente quanto segue:
+
+* La suddivisione in livelli dei dati riduce immediatamente l'efficienza di archiviazione (solo in linea).
+* Dovresti utilizzare questa policy solo se sei certo che i dati inattivi sul volume non cambieranno.
+* L'archiviazione degli oggetti non è transazionale e, se soggetta a modifiche, causerà una frammentazione significativa.
+* Considerare l'impatto dei trasferimenti SnapMirror prima di assegnare la policy di suddivisione in livelli All ai volumi di origine nelle relazioni di protezione dei dati.
++
+Poiché i dati vengono suddivisi immediatamente in livelli, SnapMirror leggerà i dati dal livello cloud anziché dal livello delle prestazioni.  Ciò comporterà operazioni SnapMirror più lente, rallentando potenzialmente anche altre operazioni SnapMirror più avanti nella coda, anche se utilizzano criteri di tiering diversi.
+
+* Anche NetApp Backup and Recovery è influenzato dai volumi impostati con una policy di suddivisione in livelli. https://docs.netapp.com/us-en/bluexp-backup-recovery/concept-ontap-backup-to-cloud.html#fabricpool-tiering-policy-considerations["Consultare le considerazioni sulla politica di suddivisione in livelli con Backup e Ripristino"^] .
+
+
+--
+Tutti i dati utente DP (backup):: Tutti i dati su un volume di protezione dati (esclusi i metadati) vengono immediatamente spostati sul livello cloud.  Se letti, i blocchi di dati freddi sul livello cloud rimangono freddi e non vengono riscritti sul livello delle prestazioni (a partire da ONTAP 9.4).
++
+--
+
+NOTE: Questa policy è disponibile per ONTAP 9.5 o versioni precedenti.  È stato sostituito con la politica di suddivisione in livelli *All* a partire da ONTAP 9.6.
+
+--
+

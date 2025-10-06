@@ -1,0 +1,244 @@
+---
+sidebar: sidebar 
+permalink: task-tiering-onprem-azure.html 
+keywords: data tiering, fabricpool, cloud tiering, tiering cold data, tiering inactive data, tiering aff, tiering fas, tiering ontap, tiering volumes, tier data, tier cold data, tier fas, tier aff, tier ontap, azure, blob, azure blob 
+summary: Libera spazio sui tuoi cluster ONTAP locali suddividendo i dati inattivi in ​​livelli di archiviazione BLOB di Azure. 
+---
+= Suddivisione dei dati in livelli dai cluster ONTAP locali allo storage BLOB di Azure in NetApp Cloud Tiering
+:hardbreaks:
+:allow-uri-read: 
+:nofooter: 
+:icons: font
+:linkattrs: 
+:imagesdir: ./media/
+
+
+[role="lead"]
+Libera spazio sui tuoi cluster ONTAP locali suddividendo i dati inattivi in ​​livelli di archiviazione BLOB di Azure.  Libera spazio sui tuoi cluster ONTAP locali suddividendo i dati inattivi in ​​livelli di archiviazione BLOB di Azure.
+
+
+
+== Avvio rapido
+
+Inizia subito seguendo questi passaggi oppure scorri verso il basso fino alle sezioni rimanenti per i dettagli completi.
+
+.image:https://raw.githubusercontent.com/NetAppDocs/common/main/media/number-1.png["Uno"]Prepararsi a suddividere i dati in livelli nell'archiviazione BLOB di Azure
+[role="quick-margin-para"]
+Ti occorre quanto segue:
+
+[role="quick-margin-list"]
+* Un cluster ONTAP locale di origine che esegue ONTAP 9.4 o versione successiva aggiunto alla console NetApp e una connessione HTTPS all'archiviazione BLOB di Azure. https://docs.netapp.com/us-en/bluexp-ontap-onprem/task-discovering-ontap.html["Scopri come scoprire un cluster"^] .
+* Un agente Console installato in una rete virtuale di Azure o in sede.
+* Rete per un agente che consente una connessione HTTPS in uscita al cluster ONTAP nel data center, all'archiviazione di Azure e al servizio Cloud Tiering.
+
+
+.image:https://raw.githubusercontent.com/NetAppDocs/common/main/media/number-2.png["Due"]Imposta livelli
+[role="quick-margin-para"]
+Nella console NetApp , seleziona un sistema ONTAP locale, seleziona *Abilita* per il servizio di suddivisione in livelli e segui le istruzioni per suddividere i dati in livelli nell'archiviazione BLOB di Azure.
+
+.image:https://raw.githubusercontent.com/NetAppDocs/common/main/media/number-3.png["Tre"]Impostare la licenza
+[role="quick-margin-para"]
+Al termine del periodo di prova gratuito, puoi pagare Cloud Tiering tramite un abbonamento pay-as-you-go, una licenza BYOL ONTAP Cloud Tiering o una combinazione di entrambi:
+
+[role="quick-margin-list"]
+* Per abbonarsi da Azure Marketplace, https://azuremarketplace.microsoft.com/en-us/marketplace/apps/netapp.cloud-manager?tab=Overview["vai all'offerta Marketplace"^] , seleziona *Iscriviti* e segui le istruzioni.
+* Per pagare utilizzando una licenza Cloud Tiering BYOL, mailto:ng-cloud-tiering@netapp.com?subject=Licensing[contattaci se devi acquistarne una], quindilink:https://docs.netapp.com/us-en/bluexp-digital-wallet/task-manage-data-services-licenses.html["aggiungilo alla console NetApp"] .
+
+
+
+
+== Requisiti
+
+Verifica il supporto per il tuo cluster ONTAP , configura la rete e prepara l'archiviazione degli oggetti.
+
+L'immagine seguente mostra ciascun componente e le connessioni che è necessario predisporre tra di essi:
+
+image:diagram_cloud_tiering_azure.png["Un'immagine dell'architettura che mostra il servizio Cloud Tiering con una connessione all'agente Console nel tuo provider cloud, l'agente con una connessione al tuo cluster ONTAP e una connessione tra il cluster ONTAP e l'archiviazione oggetti nel tuo provider cloud.  I dati attivi risiedono nel cluster ONTAP , mentre i dati inattivi risiedono nell'archiviazione degli oggetti."]
+
+
+NOTE: La comunicazione tra l'agente della console e l'archiviazione BLOB è riservata alla configurazione dell'archiviazione degli oggetti.  L'agente può risiedere presso la tua sede anziché nel cloud.
+
+
+
+=== Prepara i tuoi cluster ONTAP
+
+I cluster ONTAP devono soddisfare i seguenti requisiti quando si suddividono i dati in livelli nell'archiviazione BLOB di Azure.
+
+Piattaforme ONTAP supportate::
++
+--
+* Quando si utilizza ONTAP 9.8 e versioni successive: è possibile suddividere i dati dai sistemi AFF o dai sistemi FAS con aggregati tutti SSD o tutti HDD.
+* Quando si utilizza ONTAP 9.7 e versioni precedenti: è possibile suddividere in livelli i dati provenienti da sistemi AFF o sistemi FAS con aggregati completamente SSD.
+
+
+--
+Versione ONTAP supportata:: ONTAP 9.4 o successivo
+Requisiti di rete del cluster::
++
+--
+* Il cluster ONTAP avvia una connessione HTTPS tramite la porta 443 all'archiviazione BLOB di Azure.
++
+ONTAP legge e scrive dati da e verso l'archiviazione di oggetti.  L'archiviazione degli oggetti non si avvia mai, risponde e basta.
+
++
+Sebbene ExpressRoute offra prestazioni migliori e costi di trasferimento dati inferiori, non è obbligatorio tra il cluster ONTAP e l'archiviazione BLOB di Azure.  Ma questa è la prassi migliore consigliata.
+
+* È richiesta una connessione in ingresso dall'agente, che può risiedere in una rete virtuale di Azure o nei locali dell'utente.
++
+Non è richiesta una connessione tra il cluster e il servizio Cloud Tiering.
+
+* È necessario un LIF intercluster su ciascun nodo ONTAP che ospita i volumi che si desidera suddividere in livelli.  Il LIF deve essere associato allo _IPspace_ che ONTAP deve utilizzare per connettersi all'archiviazione degli oggetti.
++
+Quando si imposta il tiering dei dati, Cloud Tiering richiede lo spazio IP da utilizzare.  Dovresti scegliere lo spazio IP a cui è associato ciascun LIF.  Potrebbe trattarsi dello spazio IP "predefinito" o di uno spazio IP personalizzato creato da te.  Scopri di più su https://docs.netapp.com/us-en/ontap/networking/create_a_lif.html["LIF"^] E https://docs.netapp.com/us-en/ontap/networking/standard_properties_of_ipspaces.html["Spazi IP"^] .
+
+
+
+--
+Volumi e aggregati supportati:: Il numero totale di volumi che Cloud Tiering può suddividere in livelli potrebbe essere inferiore al numero di volumi presenti nel sistema ONTAP .  Questo perché i volumi non possono essere suddivisi in livelli da alcuni aggregati.  Fare riferimento alla documentazione ONTAP per https://docs.netapp.com/us-en/ontap/fabricpool/requirements-concept.html#functionality-or-features-not-supported-by-fabricpool["funzionalità o caratteristiche non supportate da FabricPool"^] .
+
+
+
+NOTE: Cloud Tiering supporta i volumi FlexGroup , a partire da ONTAP 9.5.  L'installazione funziona come per qualsiasi altro volume.
+
+
+
+=== Scopri un cluster ONTAP
+
+Prima di poter iniziare a suddividere in livelli i dati inattivi, è necessario aggiungere un sistema ONTAP locale alla console NetApp .
+
+https://docs.netapp.com/us-en/bluexp-ontap-onprem/task-discovering-ontap.html["Scopri come scoprire un cluster"^] .
+
+
+
+=== Crea o cambia agenti
+
+È necessario un agente per distribuire i dati sul cloud.  Quando si suddividono i dati in livelli nell'archiviazione BLOB di Azure, è possibile utilizzare un agente presente in una rete virtuale di Azure o in sede.  Sarà necessario creare un nuovo agente e assicurarsi che l'agente attualmente selezionato risieda in Azure o in locale.
+
+* https://docs.netapp.com/us-en/bluexp-setup-admin/concept-connectors.html["Scopri di più sugli agenti"^]
+* https://docs.netapp.com/us-en/bluexp-setup-admin/task-quick-start-connector-azure.html["Distribuzione di un agente in Azure"^]
+* https://docs.netapp.com/us-en/bluexp-setup-admin/task-quick-start-connector-on-prem.html["Installazione di un agente su un host Linux"^]
+
+
+
+
+=== Verifica di disporre delle autorizzazioni necessarie per l'agente
+
+Se hai creato l'agente Console utilizzando la versione 3.9.25 o successiva, sei a posto.  Il ruolo personalizzato che fornisce le autorizzazioni necessarie a un agente per gestire risorse e processi all'interno della rete Azure verrà configurato per impostazione predefinita.  Vedi il https://docs.netapp.com/us-en/bluexp-setup-admin/reference-permissions-azure.html#custom-role-permissions["autorizzazioni di ruolo personalizzate richieste"^] e il https://docs.netapp.com/us-en/bluexp-setup-admin/reference-permissions-azure.html#cloud-tiering["autorizzazioni specifiche richieste per Cloud Tiering"^] .
+
+Se hai creato l'agente utilizzando una versione precedente, dovrai modificare l'elenco delle autorizzazioni per l'account Azure per aggiungere eventuali autorizzazioni mancanti.
+
+
+
+=== Preparare la rete per l'agente della console
+
+Assicurarsi che l'agente della console disponga delle connessioni di rete richieste.  L'agente può essere installato in locale o in Azure.
+
+.Passi
+. Assicurarsi che la rete in cui è installato l'agente consenta le seguenti connessioni:
++
+** Una connessione HTTPS sulla porta 443 al servizio Cloud Tiering e all'archiviazione degli oggetti BLOB di Azure(https://docs.netapp.com/us-en/bluexp-setup-admin/task-set-up-networking-azure.html#endpoints-contacted-for-day-to-day-operations["vedere l'elenco degli endpoint"^] )
+** Una connessione HTTPS sulla porta 443 al LIF di gestione del cluster ONTAP
+
+
+. Se necessario, abilitare un endpoint del servizio VNet per l'archiviazione di Azure.
++
+Si consiglia un endpoint del servizio VNet per l'archiviazione di Azure se si dispone di una connessione ExpressRoute o VPN dal cluster ONTAP alla VNet e si desidera che la comunicazione tra l'agente e l'archiviazione BLOB rimanga nella rete privata virtuale.
+
+
+
+
+
+=== Preparare l'archiviazione BLOB di Azure
+
+Quando si imposta la suddivisione in livelli, è necessario identificare il gruppo di risorse che si desidera utilizzare, nonché l'account di archiviazione e il contenitore di Azure che appartengono al gruppo di risorse.  Un account di archiviazione consente a Cloud Tiering di autenticare e accedere al contenitore BLOB utilizzato per il tiering dei dati.
+
+Cloud Tiering supporta il tiering su qualsiasi account di archiviazione in qualsiasi regione a cui è possibile accedere tramite l'agente.
+
+Cloud Tiering supporta solo i tipi di account di archiviazione General Purpose v2 e Premium Block Blob.
+
+
+NOTE: Se si prevede di configurare Cloud Tiering per utilizzare un livello di accesso a costo inferiore a cui i dati suddivisi in livelli verranno trasferiti dopo un certo numero di giorni, non è necessario selezionare alcuna regola del ciclo di vita durante la configurazione del contenitore nel proprio account Azure.  Cloud Tiering gestisce le transizioni del ciclo di vita.
+
+
+
+== Suddividi i dati inattivi dal tuo primo cluster nell'archiviazione BLOB di Azure
+
+Dopo aver preparato l'ambiente Azure, inizia a suddividere in livelli i dati inattivi dal primo cluster.
+
+.Cosa ti servirà
+https://docs.netapp.com/us-en/bluexp-ontap-onprem/task-discovering-ontap.html["Un sistema ONTAP on-premise per la console NetApp"^] .
+
+.Passi
+. Selezionare il sistema ONTAP locale.
+. Fare clic su *Abilita* per il servizio Tiering dal pannello di destra.
++
+Se la destinazione del tiering di Azure Blob esiste come sistema nella pagina Sistemi, è possibile trascinare il cluster sul sistema Azure Blob per avviare la procedura guidata di configurazione.
+
++
+image:screenshot_setup_tiering_onprem.png["Uno screenshot che mostra l'opzione Abilita che appare sul lato destro dello schermo dopo aver selezionato un sistema ONTAP locale."]
+
+. *Definisci nome archivio oggetti*: inserisci un nome per questo archivio oggetti.  Deve essere univoco rispetto a qualsiasi altro archivio di oggetti che potresti utilizzare con gli aggregati su questo cluster.
+. *Seleziona provider*: seleziona *Microsoft Azure* e seleziona *Continua*.
+. *Seleziona provider*: seleziona *Microsoft Azure* e seleziona *Continua*.
+. Completare i passaggi nelle pagine *Crea archiviazione oggetti*:
++
+.. *Gruppo di risorse*: seleziona un gruppo di risorse in cui è gestito un contenitore esistente o in cui desideri creare un nuovo contenitore per i dati a livelli e seleziona *Continua*.
+.. *Gruppo di risorse*: seleziona un gruppo di risorse in cui è gestito un contenitore esistente o in cui desideri creare un nuovo contenitore per i dati a livelli e seleziona *Continua*.
++
+Quando si utilizza un agente locale, è necessario immettere la sottoscrizione di Azure che fornisce l'accesso al gruppo di risorse.
+
+.. *Contenitore di Azure*: selezionare il pulsante di opzione per aggiungere un nuovo contenitore BLOB a un account di archiviazione o per utilizzare un contenitore esistente.  Quindi seleziona l'account di archiviazione e scegli il contenitore esistente oppure inserisci il nome del nuovo contenitore.  Quindi seleziona *Continua*.
+.. *Contenitore di Azure*: selezionare il pulsante di opzione per aggiungere un nuovo contenitore BLOB a un account di archiviazione o per utilizzare un contenitore esistente.  Quindi seleziona l'account di archiviazione e scegli il contenitore esistente oppure inserisci il nome del nuovo contenitore.  Quindi seleziona *Continua*.
++
+Gli account di archiviazione e i contenitori visualizzati in questo passaggio appartengono al gruppo di risorse selezionato nel passaggio precedente.
+
+.. *Ciclo di vita del livello di accesso*: Cloud Tiering gestisce le transizioni del ciclo di vita dei dati suddivisi in livelli.  I dati iniziano nella classe _Hot_, ma è possibile creare una regola per applicare la classe _Cool_ ai dati dopo un certo numero di giorni.
++
+Selezionare il livello di accesso a cui si desidera trasferire i dati suddivisi in livelli e il numero di giorni prima che i dati vengano assegnati a tale livello, quindi selezionare *Continua*.  Ad esempio, lo screenshot qui sotto mostra che i dati a livelli vengono assegnati alla classe _Cool_ dalla classe _Hot_ dopo 45 giorni nell'archiviazione degli oggetti.
+
++
+Se si sceglie *Mantieni i dati in questo livello di accesso*, i dati rimangono nel livello di accesso _Hot_ e non vengono applicate regole. link:reference-azure-support.html["Visualizza i livelli di accesso supportati"^] .
+
++
+image:screenshot_tiering_lifecycle_selection_azure.png["Uno screenshot che mostra come selezionare un altro livello di accesso che verrà assegnato ai tuoi dati dopo un certo numero di giorni."]
+
++
+Si noti che la regola del ciclo di vita viene applicata a tutti i contenitori BLOB nell'account di archiviazione selezionato.
+
+.. *Rete cluster*: selezionare lo spazio IP che ONTAP deve utilizzare per connettersi all'archiviazione degli oggetti e selezionare *Continua*.
++
+Selezionando lo spazio IP corretto si garantisce che Cloud Tiering possa impostare una connessione da ONTAP allo storage degli oggetti del provider cloud.
+
++
+È anche possibile impostare la larghezza di banda di rete disponibile per caricare dati inattivi nell'archiviazione degli oggetti definendo la "Velocità di trasferimento massima".  Selezionare il pulsante di opzione *Limitato* e immettere la larghezza di banda massima utilizzabile, oppure selezionare *Illimitato* per indicare che non vi è alcun limite.
+
+
+
+. Nella pagina _Volumi a livelli_, seleziona i volumi per i quali desideri configurare la suddivisione in livelli e avvia la pagina Criteri di suddivisione in livelli:
++
+** Per selezionare tutti i volumi, seleziona la casella nella riga del titolo (image:button_backup_all_volumes.png[""] ) e seleziona *Configura volumi*.
+** Per selezionare più volumi, seleziona la casella per ogni volume (image:button_backup_1_volume.png[""] ) e seleziona *Configura volumi*.
+** Per selezionare un singolo volume, selezionare la riga (oimage:screenshot_edit_icon.gif["modifica icona matita"] icona) per il volume.
++
+image:screenshot_tiering_initial_volumes.png["Uno screenshot che mostra come selezionare un singolo volume, più volumi o tutti i volumi e il pulsante Modifica volumi selezionati."]
+
+
+
+. Nella finestra di dialogo _Criterio di suddivisione in livelli_, seleziona un criterio di suddivisione in livelli, modifica facoltativamente i giorni di raffreddamento per i volumi selezionati e seleziona *Applica*.
++
+link:concept-cloud-tiering.html#volume-tiering-policies["Scopri di più sulle politiche di suddivisione in livelli di volume e sui giorni di raffreddamento"] .
+
++
+image:screenshot_tiering_initial_policy_settings.png["Uno screenshot che mostra le impostazioni configurabili dei criteri di suddivisione in livelli."]
+
+
+
+.Risultato
+Hai configurato correttamente la suddivisione in livelli dei dati dai volumi sul cluster all'archiviazione di oggetti BLOB di Azure.
+
+.Cosa succederà ora?
+link:task-licensing-cloud-tiering.html["Assicurati di abbonarti al servizio Cloud Tiering"] .
+
+È possibile esaminare le informazioni sui dati attivi e inattivi del cluster. link:task-managing-tiering.html["Scopri di più sulla gestione delle impostazioni di suddivisione in livelli"] .
+
+È anche possibile creare un archivio di oggetti aggiuntivo nei casi in cui si desideri suddividere i dati da determinati aggregati su un cluster in archivi di oggetti diversi.  Oppure se si prevede di utilizzare FabricPool Mirroring, in cui i dati a livelli vengono replicati in un archivio oggetti aggiuntivo. link:task-managing-object-storage.html["Scopri di più sulla gestione degli archivi di oggetti"] .

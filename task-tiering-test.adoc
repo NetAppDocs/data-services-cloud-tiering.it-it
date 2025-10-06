@@ -1,0 +1,44 @@
+---
+sidebar: sidebar 
+permalink: task-tiering-test.html 
+keywords: throughput, latency, tiering performance, cloud performance test, tiering test, object storage performance 
+summary: Esegui un test delle prestazioni del cloud per misurare la latenza della rete e le prestazioni di throughput da un cluster ONTAP a un archivio oggetti prima e dopo aver impostato il tiering dei dati. 
+---
+= Misura la latenza della rete e le prestazioni di throughput in NetApp Cloud Tiering
+:hardbreaks:
+:allow-uri-read: 
+:nofooter: 
+:icons: font
+:linkattrs: 
+:imagesdir: ./media/
+
+
+[role="lead"]
+Esegui un test delle prestazioni del cloud per misurare la latenza della rete e le prestazioni di throughput da un cluster ONTAP a un archivio oggetti prima e dopo aver impostato il tiering dei dati in NetApp Cloud Tiering.  Il test identifica anche eventuali guasti verificatisi.
+
+Ecco alcuni esempi di risultati delle prestazioni:
+
+image:screenshot_cloud_performance_test.png["Uno screenshot dei risultati delle prestazioni del cluster per un Cloud Performance Test."]
+
+.Prima di iniziare
+È consigliabile eseguire questo controllo quando il cluster utilizza la CPU al di sotto del 50%.
+
+.Passaggi per un cluster che non è stato configurato per la suddivisione in livelli
+. Dal menu di navigazione a sinistra, seleziona *Mobilità > Cloud Tiering*.
+. Dalla pagina *Cluster*, seleziona l'icona del menu per un cluster e seleziona *Cloud Performance Test*.
+. Rivedi i dettagli e seleziona *Continua*.
+. Rivedi i dettagli e seleziona *Continua*.
+. Seguire le istruzioni per fornire le informazioni richieste.
++
+Le informazioni che devi fornire sono le stesse che dovresti fornire se dovessi impostare la suddivisione in livelli sul cluster.
+
+. Facoltativamente, proseguire con la procedura guidata Tier Volumes per completare la configurazione.
+
+
+.Passaggi per un cluster configurato per la suddivisione in livelli
+. Dal menu di navigazione a sinistra, seleziona *Mobilità > Cloud Tiering*.
+. Dalla pagina *Cluster*, seleziona l'icona del menu per un cluster e seleziona *Cloud Performance Test*.
+. Dalla pagina *Cluster*, seleziona l'icona del menu per un cluster e seleziona *Cloud Performance Test*.
+. Selezionare un nodo dall'elenco a discesa.
+. Visualizza i risultati o ricontrolla le prestazioni.
+
